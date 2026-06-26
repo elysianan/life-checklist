@@ -2853,6 +2853,8 @@ body {
 .ai-form-toggle { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 14px; color: #1d1d1f; }
 .dark .ai-form-toggle { color: #fff; }
 .ai-test-result { font-size: 13px; min-height: 18px; margin-top: 6px; }
+.ai-test-result.ok { color: #34c759; }
+.ai-test-result.fail { color: #ff3b30; }
 /* ==================== AI 为你推荐 ==================== */
 
 .recommendations-section {
