@@ -74,6 +74,11 @@ code += `
   assert('每项含 templateId、reason、source', recs.items.every(i => i.templateId && i.reason && i.source));
   assert('缓存已写入', localStorage.getItem('life_checklist_recommendations_cache') !== null);
 
+  // ---- Task 5：AI 推荐理由润色降级 ----
+  const polished = await AIService.generateRecommendationReason('测试理由', { title: '测试', category: '旅行' }, ctx);
+  assert('未配置 AI 时返回 rule', polished.source === 'rule');
+  assert('未配置 AI 时返回原理由', polished.text === '测试理由');
+
   __done(passed, failed);
 })();
 `;

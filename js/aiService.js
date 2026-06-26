@@ -148,5 +148,67 @@ const AIService = {
     } finally {
       clearTimeout(timer);
     }
+  },
+
+  /**
+   * 调用真实大模型处理自定义 prompt（OpenAI 兼容）
+   * 15 秒超时
+   */
+  async callRealAPIWithPrompt(prompt, config) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const resp = await fetch(`${config.baseURL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'system', content: '你是一位温暖、真诚的人生记录助手。' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.8,
+          max_tokens: 80
+        }),
+        signal: controller.signal
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      const text = data.choices && data.choices[0] && data.choices[0].message
+        ? data.choices[0].message.content.trim()
+        : '';
+      if (!text) throw new Error('空响应');
+      return text;
+    } finally {
+      clearTimeout(timer);
+    }
+  },
+
+  /**
+   * 润色推荐理由
+   * @returns {{source:'rule'|'api', text:string, degraded?:boolean}}
+   */
+  async generateRecommendationReason(baseReason, template, userContext) {
+    const cfg = SettingsManager.getAIConfig();
+    if (!cfg.enabled || !cfg.apiKey) {
+      return { source: 'rule', text: baseReason };
+    }
+
+    const prompt = [
+      '你是一位温暖的人生记录助手。请把下面这条推荐理由改得更自然、更有温度，25-35 字以内，不要改变原意，不要加标题。',
+      `推荐理由：「${baseReason}」`,
+      `推荐清单：${template.title}（${template.category}）`
+    ].join('\n');
+
+    try {
+      const text = await this.callRealAPIWithPrompt(prompt, cfg);
+      return { source: 'api', text };
+    } catch (e) {
+      console.warn('AI 润色推荐理由失败，降级规则引擎:', e.message);
+      return { source: 'rule', text: baseReason, degraded: true };
+    }
   }
 };
