@@ -4,6 +4,147 @@
 
 const TemplateManager = {
   /**
+   * 渲染「为你推荐」区域
+   */
+  async renderRecommendations() {
+    const container = document.getElementById('recommendations-container');
+    if (!container) return;
+
+    try {
+      const { items, refreshCount, canRefresh } = await RecommendationEngine.getRecommendations({ limit: 3 });
+
+      if (!items || items.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+
+      container.innerHTML = `
+        <div class="recommendations-header">
+          <h3>🎯 为你推荐</h3>
+          <button class="refresh-btn" id="refresh-recommendations" ${canRefresh ? '' : 'disabled'}>
+            换一批 ↻
+          </button>
+        </div>
+        <div class="recommendations-scroll">
+          ${items.map(item => this.createRecommendationCard(item)).join('')}
+        </div>
+      `;
+
+      // 绑定卡片点击
+      container.querySelectorAll('.recommendation-card').forEach(card => {
+        const templateId = card.dataset.templateId;
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.recommendation-card-dismiss')) return;
+          this.showTemplatePreview(templateId);
+        });
+      });
+
+      // 绑定不感兴趣
+      container.querySelectorAll('.recommendation-card-dismiss').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const templateId = btn.dataset.templateId;
+          RecommendationEngine.dismissRecommendation(templateId);
+          const card = btn.closest('.recommendation-card');
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.9)';
+          setTimeout(() => this.renderRecommendations(), 250);
+        });
+      });
+
+      // 绑定换一批
+      const refreshBtn = document.getElementById('refresh-recommendations');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          refreshBtn.disabled = true;
+          refreshBtn.textContent = '生成中...';
+          await RecommendationEngine.refreshRecommendations({ limit: 3 });
+          await this.renderRecommendations();
+        });
+      }
+    } catch (e) {
+      console.error('渲染推荐区域失败:', e);
+      container.classList.add('hidden');
+    }
+  },
+
+  /**
+   * 创建推荐卡片 HTML
+   */
+  createRecommendationCard(item) {
+    return `
+      <div class="recommendation-card" data-template-id="${item.templateId}">
+        <div class="recommendation-card-header">
+          <div class="recommendation-card-meta">
+            <span class="recommendation-card-emoji">${item.emoji}</span>
+            <span class="recommendation-card-category">${item.category}</span>
+          </div>
+          <button class="recommendation-card-dismiss" data-template-id="${item.templateId}">×</button>
+        </div>
+        <h4 class="recommendation-card-title">${item.title}</h4>
+        <p class="recommendation-card-reason">${item.reason}</p>
+        <div class="recommendation-card-action">查看详情 →</div>
+      </div>
+    `;
+  },
+
+  /**
+   * 显示模板预览（复用添加按钮逻辑，但不自动添加）
+   */
+  showTemplatePreview(templateId) {
+    const template = TEMPLATE_LIBRARY.find(t => t.id === templateId);
+    if (!template) return;
+
+    const isAdded = StorageManager.isTemplateAdded(templateId);
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-content" style="max-width: 360px; max-height: 80vh; overflow-y: auto;">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" style="background: ${template.color}15">
+            ${template.emoji}
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">${template.title}</h3>
+            <p class="text-sm text-apple-gray">${template.category} · ${template.taskCount} 项</p>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">${template.description}</p>
+        <div class="space-y-2 mb-4">
+          ${template.tasks.slice(0, 5).map(task => `
+            <div class="text-sm py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              ${typeof task === 'string' ? task : task.text}
+            </div>
+          `).join('')}
+          ${template.tasks.length > 5 ? `<div class="text-center text-xs text-apple-gray">还有 ${template.tasks.length - 5} 项...</div>` : ''}
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+          <button class="modal-btn modal-btn-confirm" id="preview-add-template" ${isAdded ? 'disabled' : ''}>
+            ${isAdded ? '已添加' : '添加到人生进度'}
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const addBtn = document.getElementById('preview-add-template');
+    if (addBtn && !isAdded) {
+      addBtn.addEventListener('click', () => {
+        this.addTemplateToMyLists(templateId, addBtn);
+      });
+    }
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+  },
+
+  /**
    * 渲染清单大全页面
    */
   renderTemplateLibrary() {
@@ -36,6 +177,9 @@ const TemplateManager = {
 
       container.appendChild(section);
     });
+
+    // 渲染为你推荐
+    this.renderRecommendations();
 
     // 添加分类导航
     this.renderCategoryNav(categories);
