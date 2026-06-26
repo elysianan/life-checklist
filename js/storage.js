@@ -12,7 +12,8 @@ const StorageManager = {
     TODAY_DATE: 'life_checklist_today_date',
     ADDED_TEMPLATES: 'life_checklist_added_templates',
     STREAK_DATA: 'life_checklist_streak_data',
-    LAST_VISIT: 'life_checklist_last_visit'
+    LAST_VISIT: 'life_checklist_last_visit',
+    RECOMMENDATIONS_CACHE: 'life_checklist_recommendations_cache'
   },
 
   getBirthDate() {
@@ -86,6 +87,10 @@ const StorageManager = {
       added.push(templateId);
       localStorage.setItem(this.KEYS.ADDED_TEMPLATES, JSON.stringify(added));
     }
+  },
+
+  setAddedTemplates(templateIds) {
+    localStorage.setItem(this.KEYS.ADDED_TEMPLATES, JSON.stringify(templateIds || []));
   },
 
   getStreakData() {
