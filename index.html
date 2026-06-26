@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>人生已完成清单</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- 自定义配置 -->
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            apple: {
+              gray: '#86868b',
+              dark: '#1d1d1f',
+              light: '#f5f5f7',
+              green: '#34c759',
+              blue: '#007aff',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- 自定义样式 -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50 dark:bg-black">
+
+  <!-- 主容器 - 移动端适配 -->
+  <div class="max-w-md mx-auto px-4 pb-24 min-h-screen">
+
+    <!-- ==================== 首页视图 - 人生进度 ==================== -->
+    <div id="home-view">
+
+      <!-- 头部标题 -->
+      <header class="pt-6 pb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+              人生进度
+            </h1>
+            <p class="text-apple-gray text-sm">
+              珍惜当下，活出精彩 ✨
+            </p>
+          </div>
+          <button id="share-btn" class="w-10 h-10 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-apple-blue">
+              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- 连续打卡卡片 -->
+      <section class="mb-6">
+        <div class="streak-card">
+          <div class="streak-icon">🔥</div>
+          <div class="streak-info">
+            <div class="streak-main">
+              <span class="streak-number" id="streak-current">0</span>
+              <span class="streak-unit">天</span>
+            </div>
+            <div class="streak-sub">
+              连续打卡 · 最高 <span id="streak-longest">0</span> 天
+            </div>
+          </div>
+          <div class="streak-status pending" id="streak-status">
+            ⏰ 今日还未打卡
+          </div>
+        </div>
+      </section>
+
+      <!-- 人生进度条模块（环形） -->
+      <section class="mb-6">
+        <div class="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm">
+          <!-- 标题和输入 -->
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-lg font-semibold text-apple-dark dark:text-white">
+              你的人生已走过
+            </h2>
+            <div class="flex items-center gap-2">
+              <label for="birth-date" class="text-xs text-apple-gray">
+                出生日期
+              </label>
+              <input
+                type="date"
+                id="birth-date"
+                class="text-sm bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-1.5 text-apple-dark dark:text-white border-0 focus:ring-2 focus:ring-apple-blue"
+              >
+            </div>
+          </div>
+
+          <!-- 环形进度条 - 更大更突出 -->
+          <div class="circular-progress-large">
+            <svg viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#34c759;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#30d158;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <circle class="progress-circle-bg" cx="50" cy="50" r="40"/>
+              <circle id="life-progress-circle" class="progress-circle" cx="50" cy="50" r="40"/>
+            </svg>
+            <div class="progress-center">
+              <div>
+                <span id="life-progress-percent" class="progress-percent-large">0</span>
+                <span class="progress-percent-symbol-large">%</span>
+              </div>
+              <p class="progress-label-large">人生进度</p>
+            </div>
+          </div>
+
+          <!-- 统计卡片 -->
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-value" id="total-completed">0</div>
+              <div class="stat-label">已完成</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="total-tasks">0</div>
+              <div class="stat-label">总任务</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">80</div>
+              <div class="stat-label">预期寿命</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 今日格言 -->
+      <section class="mb-6">
+        <div class="quote-card">
+          <div class="quote-icon">💡</div>
+          <p class="quote-text" id="daily-quote">人生就像一场旅行，不必在乎目的地，在乎的是沿途的风景以及看风景的心情。</p>
+          <p class="quote-author">— 余秋雨</p>
+        </div>
+      </section>
+
+      <!-- 快速统计 -->
+      <section class="mb-6">
+        <div class="quick-stats">
+          <div class="quick-stat-item">
+            <span class="quick-stat-emoji">📅</span>
+            <span class="quick-stat-value" id="days-lived">0</span>
+            <span class="quick-stat-label">已活天数</span>
+          </div>
+          <div class="quick-stat-item">
+            <span class="quick-stat-emoji">⏰</span>
+            <span class="quick-stat-value" id="days-left">0</span>
+            <span class="quick-stat-label">剩余天数</span>
+          </div>
+          <div class="quick-stat-item">
+            <span class="quick-stat-emoji">🎯</span>
+            <span class="quick-stat-value" id="today-completed">0</span>
+            <span class="quick-stat-label">今日完成</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== 清单页视图 - 我的人生进度清单 ==================== -->
+    <div id="lists-view" class="hidden">
+
+      <!-- 头部标题 -->
+      <header class="pt-6 pb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+              人生进度
+            </h1>
+            <p class="text-apple-gray text-sm" id="lists-count">
+              共 0 个清单
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="search-btn" class="w-10 h-10 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-apple-gray">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+              </svg>
+            </button>
+            <button id="sort-btn" class="w-10 h-10 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-apple-gray">
+                <path d="M3 6h18M3 12h12M3 18h6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 清单统计概览 -->
+      <section class="mb-4">
+        <div class="lists-overview">
+          <div class="lists-overview-item">
+            <span class="lists-overview-value" id="lists-total">0</span>
+            <span class="lists-overview-label">总清单</span>
+          </div>
+          <div class="lists-overview-divider"></div>
+          <div class="lists-overview-item">
+            <span class="lists-overview-value" id="lists-completed">0</span>
+            <span class="lists-overview-label">已完成</span>
+          </div>
+          <div class="lists-overview-divider"></div>
+          <div class="lists-overview-item">
+            <span class="lists-overview-value" id="lists-tasks">0</span>
+            <span class="lists-overview-label">总任务</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 清单卡片容器 -->
+      <section>
+        <div id="list-cards-container">
+          <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+
+        <!-- 添加清单按钮 -->
+        <button id="add-list-btn" class="add-list-card">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          创建新清单
+        </button>
+      </section>
+
+    </div>
+
+    <!-- ==================== 清单大全页视图 ==================== -->
+    <div id="templates-view" class="hidden">
+
+      <!-- 返回按钮 -->
+      <div class="pt-6 pb-4">
+        <button
+          id="template-back-btn"
+          class="flex items-center gap-2 text-apple-blue font-medium"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          返回
+        </button>
+      </div>
+
+      <!-- 头部 -->
+      <header class="mb-4">
+        <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+          清单大全
+        </h1>
+        <p class="text-apple-gray text-sm">
+          已添加 <span id="template-added-count">0</span> / <span id="template-total-count">0</span> 个清单
+        </p>
+      </header>
+
+      <!-- 分类导航 -->
+      <div class="template-category-nav" id="template-category-nav">
+        <!-- 分类将通过 JavaScript 动态生成 -->
+      </div>
+
+      <!-- 模板列表 -->
+      <section id="template-library-container">
+        <!-- 模板将通过 JavaScript 动态生成 -->
+      </section>
+
+    </div>
+
+    <!-- ==================== 人生轴页视图 ==================== -->
+    <div id="timeline-view" class="hidden">
+
+      <!-- 返回按钮 -->
+      <div class="pt-6 pb-4">
+        <button
+          id="timeline-back-btn"
+          class="flex items-center gap-2 text-apple-blue font-medium"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          返回
+        </button>
+      </div>
+
+      <!-- 头部 -->
+      <header class="mb-4">
+        <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+          人生轴
+        </h1>
+        <p class="text-apple-gray text-sm">
+          记录人生的每个精彩瞬间 · 已完成 <span id="timeline-count">0</span> 件事
+        </p>
+      </header>
+
+      <!-- 时间线容器 -->
+      <section id="timeline-container">
+        <!-- 时间线将通过 JavaScript 动态生成 -->
+      </section>
+
+    </div>
+
+    <!-- ==================== 详情页视图 ==================== -->
+    <div id="detail-view" class="hidden">
+
+      <!-- 返回按钮 -->
+      <div class="pt-6 pb-4">
+        <button
+          id="back-btn"
+          class="flex items-center gap-2 text-apple-blue font-medium"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          返回
+        </button>
+      </div>
+
+      <!-- 详情页头部 -->
+      <div class="detail-header" id="detail-header">
+        <div class="detail-emoji" id="detail-emoji"></div>
+        <h2 class="detail-title" id="detail-title"></h2>
+        <p class="detail-description" id="detail-description"></p>
+
+        <!-- 环形进度 -->
+        <div class="detail-progress">
+          <div class="detail-circular-progress">
+            <svg viewBox="0 0 100 100">
+              <circle class="detail-progress-circle-bg" cx="50" cy="50" r="40"/>
+              <circle id="detail-progress-circle" class="detail-progress-circle" cx="50" cy="50" r="40"/>
+            </svg>
+            <div class="detail-progress-center">
+              <span id="detail-progress-percent" class="detail-progress-percent">0</span>
+              <span class="detail-progress-percent-symbol">%</span>
+            </div>
+          </div>
+          <p class="detail-progress-text" id="detail-progress-text">已完成 0 / 0 项</p>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="detail-actions" id="detail-actions"></div>
+      </div>
+
+      <!-- 任务列表 -->
+      <section>
+        <h3 class="text-lg font-semibold text-apple-dark dark:text-white mb-4">
+          待办事项
+        </h3>
+        <div id="task-list">
+          <!-- 任务将通过 JavaScript 动态生成 -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== 成就页视图 ==================== -->
+    <div id="achievements-view" class="hidden">
+
+      <!-- 返回按钮 -->
+      <div class="pt-6 pb-4">
+        <button
+          id="ach-back-btn"
+          class="flex items-center gap-2 text-apple-blue font-medium"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          返回
+        </button>
+      </div>
+
+      <!-- 成就头部 -->
+      <div class="achievement-header">
+        <div class="achievement-header-emoji">🏆</div>
+        <h2>成就墙</h2>
+        <div class="achievement-count" id="achievement-count">0/15</div>
+        <p class="text-sm opacity-90">已解锁成就</p>
+
+        <div class="achievement-progress-container">
+          <div class="achievement-mini-progress">
+            <svg viewBox="0 0 100 100">
+              <circle class="progress-circle-bg" cx="50" cy="50" r="40" style="stroke: rgba(255,255,255,0.3); stroke-width: 8;"/>
+              <circle id="achievement-progress-circle" class="progress-circle" cx="50" cy="50" r="40" style="stroke: white; stroke-width: 8;"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 成就列表 -->
+      <section>
+        <div id="achievement-wall">
+          <!-- 成就将通过 JavaScript 动态生成 -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== 统计页视图 ==================== -->
+    <div id="statistics-view" class="hidden">
+
+      <!-- 返回按钮 -->
+      <div class="pt-6 pb-4">
+        <button
+          id="stats-back-btn"
+          class="flex items-center gap-2 text-apple-blue font-medium"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          返回
+        </button>
+      </div>
+
+      <!-- 统计头部 -->
+      <div class="stats-page-header">
+        <h2 class="text-2xl font-bold mb-2">📊 数据统计</h2>
+        <p class="text-sm opacity-90">了解你的完成情况</p>
+
+        <div class="stats-overview">
+          <div class="stats-overview-item">
+            <div class="stats-overview-value" id="stat-total-completed">0</div>
+            <div class="stats-overview-label">已完成任务</div>
+          </div>
+          <div class="stats-overview-item">
+            <div class="stats-overview-value" id="stat-overall-percent">0%</div>
+            <div class="stats-overview-label">总完成率</div>
+          </div>
+          <div class="stats-overview-item">
+            <div class="stats-overview-value" id="stat-completed-lists">0</div>
+            <div class="stats-overview-label">完成清单</div>
+          </div>
+          <div class="stats-overview-item">
+            <div class="stats-overview-value" id="stat-today-completed">0</div>
+            <div class="stats-overview-label">今日完成</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 图表区域 -->
+      <div class="chart-card">
+        <h3>📈 完成进度</h3>
+        <div class="chart-container-small">
+          <canvas id="completion-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>📊 分类分布</h3>
+        <div class="chart-container">
+          <canvas id="category-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>📅 本周趋势</h3>
+        <div class="chart-container">
+          <canvas id="weekly-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>🏅 清单排行榜</h3>
+        <div id="ranking-list">
+          <!-- 排行榜将通过 JavaScript 动态生成 -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== 个人中心视图 ==================== -->
+    <div id="profile-view" class="hidden">
+
+      <!-- 返回按钮 -->
+      <div class="pt-6 pb-4">
+        <button
+          id="profile-back-btn"
+          class="flex items-center gap-2 text-apple-blue font-medium"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          返回
+        </button>
+      </div>
+
+      <!-- 个人中心头部 -->
+      <div class="profile-header">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-name">人生探索者</div>
+        <div class="profile-level" id="profile-level">Lv.0</div>
+        <div class="profile-age" id="profile-age" style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 1rem;"></div>
+
+        <div class="profile-level-progress">
+          <div class="profile-level-bar" id="level-progress" style="width: 0%"></div>
+        </div>
+        <div class="profile-level-text" id="level-progress-text">距离下一级还需 1 个任务</div>
+      </div>
+
+      <!-- 统计数据 -->
+      <div class="profile-stats">
+        <div class="profile-stat-item">
+          <div class="profile-stat-value" id="profile-total-completed">0</div>
+          <div class="profile-stat-label">已完成</div>
+        </div>
+        <div class="profile-stat-item">
+          <div class="profile-stat-value" id="profile-total-tasks">0</div>
+          <div class="profile-stat-label">总任务</div>
+        </div>
+        <div class="profile-stat-item">
+          <div class="profile-stat-value" id="profile-achievements">0</div>
+          <div class="profile-stat-label">成就</div>
+        </div>
+        <div class="profile-stat-item">
+          <div class="profile-stat-value" id="profile-today">0</div>
+          <div class="profile-stat-label">今日</div>
+        </div>
+      </div>
+
+      <!-- 最近成就 -->
+      <div class="profile-section">
+        <div class="profile-section-title">🏆 最近成就</div>
+        <div class="achievement-preview" id="profile-achievements-preview">
+          <!-- 成就将通过 JavaScript 动态生成 -->
+        </div>
+      </div>
+
+      <!-- 设置列表 -->
+      <div class="profile-section">
+        <div class="profile-section-title">⚙️ 设置</div>
+        <div id="settings-list">
+          <!-- 设置项将通过 JavaScript 动态生成 -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== AI 人生报告视图 ==================== -->
+    <div id="report-view" class="hidden">
+      <!-- 返回按钮 -->
+      <div class="pt-6 pb-4">
+        <button id="report-back-btn" class="flex items-center gap-2 text-apple-blue font-medium">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          返回
+        </button>
+      </div>
+
+      <!-- 头部 + 时段切换 -->
+      <header class="mb-4">
+        <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-3">✨ AI 人生报告</h1>
+        <div class="report-period-tabs" id="report-period-tabs">
+          <button class="report-tab active" data-period="month">本月</button>
+          <button class="report-tab" data-period="year">本年</button>
+          <button class="report-tab" data-period="all">全部</button>
+        </div>
+      </header>
+
+      <!-- 加载态 -->
+      <div id="report-loading" class="report-loading hidden">
+        <div class="report-spinner"></div>
+        <p>AI 正在为你撰写人生报告…</p>
+      </div>
+
+      <!-- 报告卡片（可截图区域） -->
+      <section>
+        <div id="report-card" class="report-card"></div>
+      </section>
+
+      <!-- 操作按钮 -->
+      <div class="report-actions" id="report-actions">
+        <button id="report-regenerate-btn" class="report-action-btn">🔄 重新生成</button>
+        <button id="report-save-btn" class="report-action-btn">💾 保存图片</button>
+        <button id="report-copy-btn" class="report-action-btn">📋 复制文字</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== 底部导航栏 ==================== -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-view="home">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">首页</span>
+    </div>
+    <div class="nav-item" data-view="lists">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">进度</span>
+    </div>
+    <div class="nav-item" data-view="templates">
+      <span class="nav-icon">📚</span>
+      <span class="nav-label">大全</span>
+    </div>
+    <div class="nav-item" data-view="timeline">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">人生轴</span>
+    </div>
+    <div class="nav-item" data-view="profile">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">我的</span>
+    </div>
+  </nav>
+
+  <!-- JavaScript -->
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/custom.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/taskDetail.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/statistics.js"></script>
+  <script src="js/aiService.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

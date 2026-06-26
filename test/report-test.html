@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>报告模块测试</title>
+  <style>body{font-family:sans-serif;padding:20px}.pass{color:#34c759}.fail{color:#ff3b30}</style>
+</head>
+<body>
+  <h1>report.js / aiService.js 单元测试</h1>
+  <div id="results"></div>
+
+  <!-- 被测依赖 -->
+  <script src="../js/data.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/settings.js"></script>
+  <script src="../js/aiService.js"></script>
+  <script src="../js/report.js"></script>
+
+  <script>
+    // 极简断言器（中文输出）
+    const out = document.getElementById('results');
+    let passed = 0, failed = 0;
+    function assert(name, cond) {
+      const ok = !!cond;
+      ok ? passed++ : failed++;
+      const p = document.createElement('p');
+      p.className = ok ? 'pass' : 'fail';
+      p.textContent = (ok ? '✅ ' : '❌ ') + name;
+      out.appendChild(p);
+      if (!ok) console.error('断言失败:', name);
+    }
+
+    // 准备 mock 数据：直接写入 localStorage
+    function seedMockData() {
+      localStorage.clear();
+      const today = new Date();
+      const iso = (d) => d.toISOString().split('T')[0]; // YYYY-MM-DD
+      const lists = [
+        { id:'travel', emoji:'🌍', title:'环游世界', description:'', color:'#007AFF', category:'旅行',
+          tasks:[
+            { id:'a', text:'看极光', completed:true, completedDate: iso(today), note:'', priority:'medium' },
+            { id:'b', text:'去巴黎', completed:true, completedDate: iso(today), note:'', priority:'medium' },
+            { id:'c', text:'潜水', completed:false, completedDate:'', note:'', priority:'medium' }
+          ]
+        },
+        { id:'skills', emoji:'🎯', title:'技能解锁', description:'', color:'#FF9500', category:'成长',
+          tasks:[
+            { id:'d', text:'学吉他', completed:true, completedDate: iso(today), note:'', priority:'medium' }
+          ]
+        }
+      ];
+      StorageManager.setLists(lists);
+      StorageManager.setStreakData({ currentStreak:5, longestStreak:9, lastCheckDate: today.toDateString(), todayChecked:true });
+      StorageManager.setBirthDate('1998-01-01');
+    }
+
+    // ---- Task 1 测试 ----
+    seedMockData();
+    const r = ReportManager.aggregateReportData('all');
+    assert('aggregateReportData 返回对象', r && typeof r === 'object');
+    assert('全部时段完成数为 3', r.totalCompleted === 3);
+    assert('hasData 为 true', r.hasData === true);
+    assert('最活跃分类是环游世界(2件)', r.topCategory && r.topCategory.title === '环游世界' && r.topCategory.count === 2);
+    assert('byCategory 按 count 降序', r.byCategory[0].count >= r.byCategory[1].count);
+    assert('streak 透传正确', r.streak.current === 5 && r.streak.longest === 9);
+    assert('lifeProgress 含年龄', typeof r.lifeProgress.age === 'number' && r.lifeProgress.age > 0);
+
+    const rMonth = ReportManager.aggregateReportData('month');
+    assert('本月完成数为 3(mock 全是今天)', rMonth.totalCompleted === 3);
+
+    // ---- Task 2 测试 ----
+    const narrative = AIService.callRuleEngine(r);
+    assert('callRuleEngine 返回 source=rule', narrative.source === 'rule');
+    assert('生成 4 段文案', Array.isArray(narrative.paragraphs) && narrative.paragraphs.length === 4);
+    assert('每段非空字符串', narrative.paragraphs.every(p => typeof p === 'string' && p.length > 0));
+    assert('文案包含完成数字', narrative.paragraphs[0].includes('3'));
+
+    // ---- Task 3 测试 ----
+    SettingsManager.setAIConfig({ provider:'deepseek', apiKey:'sk-test', enabled:true });
+    const cfg = SettingsManager.getAIConfig();
+    assert('AI 配置已保存 provider', cfg.provider === 'deepseek');
+    assert('AI 配置带 baseURL', cfg.baseURL.includes('deepseek'));
+    assert('AI 配置 enabled', cfg.enabled === true);
+    SettingsManager.setAIConfig({ enabled:false, apiKey:'' }); // 清理，避免影响后续
+
+    // ---- Task 6 测试（纯函数渲染）----
+    const html6 = ReportManager._buildCardHTML(r, narrative);
+    assert('卡片含完成事项', html6.includes('完成事项'));
+    assert('卡片含分类洞察', html6.includes('分类洞察'));
+    assert('纯文本含标题', ReportManager._plainText(r, narrative).includes('我的人生报告'));
+
+    document.title = `测试 ${passed} 通过 / ${failed} 失败`;
+
+    // ---- Task 4 测试（异步）----
+    (async () => {
+      const n = await AIService.generateNarrative(r);
+      assert('未启用时降级为规则引擎', n.source === 'rule');
+      assert('buildPrompt 含完成数', AIService.buildPrompt(r).includes(String(r.totalCompleted)));
+      document.title = `测试 ${passed} 通过 / ${failed} 失败`;
+    })();
+  </script>
+</body>
+</html>

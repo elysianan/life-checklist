@@ -1,0 +1,158 @@
+/**
+ * 分享模块
+ */
+
+const ShareManager = {
+  showShareModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'share-overlay';
+    overlay.innerHTML = `
+      <div class="share-modal">
+        <div class="share-modal-header">
+          <h3>分享我的成就</h3>
+          <button class="share-close-btn" onclick="this.closest('.share-overlay').remove()">✕</button>
+        </div>
+        <div class="share-preview" id="share-preview">
+          ${this.generateShareCard()}
+        </div>
+        <div class="share-actions">
+          <button class="share-btn share-btn-copy" onclick="ShareManager.copyShareText()">
+            📋 复制文字
+          </button>
+          <button class="share-btn share-btn-image" onclick="ShareManager.downloadShareImage()">
+            💾 保存图片
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+  },
+
+  generateShareCard() {
+    const stats = StorageManager.getOverallStats();
+    const lists = StorageManager.getLists() || DEFAULT_LISTS;
+    const achievements = StorageManager.getUnlockedAchievements();
+
+    const topList = lists.reduce((max, list) => {
+      const progress = StorageManager.calculateListProgress(list);
+      const maxProgress = StorageManager.calculateListProgress(max);
+      return progress.percentage > maxProgress.percentage ? list : max;
+    }, lists[0]);
+
+    const topProgress = StorageManager.calculateListProgress(topList);
+
+    return `
+      <div class="share-card">
+        <div class="share-card-header">
+          <div class="share-card-logo">✨</div>
+          <h4>人生已完成清单</h4>
+        </div>
+
+        <div class="share-card-stats">
+          <div class="share-stat">
+            <span class="share-stat-value">${stats.totalCompleted}</span>
+            <span class="share-stat-label">已完成任务</span>
+          </div>
+          <div class="share-stat-divider"></div>
+          <div class="share-stat">
+            <span class="share-stat-value">${achievements.length}</span>
+            <span class="share-stat-label">解锁成就</span>
+          </div>
+          <div class="share-stat-divider"></div>
+          <div class="share-stat">
+            <span class="share-stat-value">${stats.completedLists}</span>
+            <span class="share-stat-label">完成清单</span>
+          </div>
+        </div>
+
+        <div class="share-card-highlight">
+          <div class="share-highlight-emoji">${topList.emoji}</div>
+          <div class="share-highlight-info">
+            <span class="share-highlight-title">最佳进度</span>
+            <span class="share-highlight-name">${topList.title} ${Math.round(topProgress.percentage)}%</span>
+          </div>
+        </div>
+
+        <div class="share-card-footer">
+          <span>记录人生每一个精彩时刻</span>
+          <span class="share-card-date">${new Date().toLocaleDateString('zh-CN')}</span>
+        </div>
+      </div>
+    `;
+  },
+
+  copyShareText() {
+    const stats = StorageManager.getOverallStats();
+    const achievements = StorageManager.getUnlockedAchievements();
+
+    const text = `✨ 我的人生清单进度 ✨
+
+📊 已完成 ${stats.totalCompleted} 个任务
+🏆 解锁 ${achievements.length} 个成就
+✅ 完成 ${stats.completedLists} 个清单
+
+人生就像一场旅行，每完成一个小目标都是值得纪念的时刻！
+
+#人生清单 #记录生活 #成就`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      this.showToast('已复制到剪贴板 ✅');
+    }).catch(() => {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      this.showToast('已复制到剪贴板 ✅');
+    });
+  },
+
+  downloadShareImage() {
+    const card = document.querySelector('.share-card');
+    if (!card) return;
+
+    if (!window.html2canvas) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.onload = () => {
+        this.captureCard(card);
+      };
+      document.head.appendChild(script);
+    } else {
+      this.captureCard(card);
+    }
+  },
+
+  captureCard(element) {
+    html2canvas(element, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = '人生清单成就_' + new Date().toISOString().slice(0, 10) + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      this.showToast('图片已保存 ✅');
+    });
+  },
+
+  showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'share-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  }
+};
