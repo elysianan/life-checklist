@@ -79,6 +79,14 @@ code += `
   assert('未配置 AI 时返回 rule', polished.source === 'rule');
   assert('未配置 AI 时返回原理由', polished.text === '测试理由');
 
+  // ---- Task 6：dismiss 后 forceRefresh 不再出现 ----
+  {
+    const initialItems = recs.items;
+    RecommendationEngine.dismissRecommendation(initialItems[0].templateId);
+    const afterDismiss = await RecommendationEngine.getRecommendations({ limit: 3, forceRefresh: true });
+    assert('dismiss 后 forceRefresh 结果不含该模板', !afterDismiss.items.some(i => i.templateId === initialItems[0].templateId));
+  }
+
   __done(passed, failed);
 })();
 `;

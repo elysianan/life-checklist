@@ -122,7 +122,7 @@ const TemplateManager = {
           ${template.tasks.length > 5 ? `<div class="text-center text-xs text-apple-gray">还有 ${template.tasks.length - 5} 项...</div>` : ''}
         </div>
         <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+          <button class="modal-btn modal-btn-cancel">关闭</button>
           <button class="modal-btn modal-btn-confirm" id="preview-add-template" ${isAdded ? 'disabled' : ''}>
             ${isAdded ? '已添加' : '添加到人生进度'}
           </button>
@@ -136,6 +136,13 @@ const TemplateManager = {
     if (addBtn && !isAdded) {
       addBtn.addEventListener('click', () => {
         this.addTemplateToMyLists(templateId, addBtn);
+      });
+    }
+
+    const closeBtn = overlay.querySelector('.modal-btn-cancel');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        overlay.remove();
       });
     }
 

@@ -277,7 +277,7 @@ const RecommendationEngine = {
     const cache = this._getCache();
     const currentCount = (cache && cache.refreshCount) || 0;
     if (currentCount >= 3) {
-      return { items: [], refreshCount: currentCount, canRefresh: false };
+      return { items: (cache && cache.items) || [], refreshCount: currentCount, canRefresh: false };
     }
     return this.getRecommendations({ ...options, forceRefresh: true });
   },
