@@ -280,6 +280,18 @@ function renderListCards() {
 
   const sortedLists = SettingsManager.sortLists([...AppState.lists]);
 
+  if (sortedLists.length === 0) {
+    const recs = RecommendationEngine.getEmptyStateRecommendations();
+    const recNames = recs.map(r => `「${r.title}」`).join('、');
+    container.innerHTML = `
+      <div class="empty-recommendations">
+        <p>人生清单很长，从 ${recNames} 开始探索吧。</p>
+        <button class="primary-btn" onclick="showTemplatesPage()">去发现更多清单</button>
+      </div>
+    `;
+    return;
+  }
+
   sortedLists.forEach((list, index) => {
     const progress = StorageManager.calculateListProgress(list);
     const card = createListCard(list, progress);
