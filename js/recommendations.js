@@ -3,10 +3,6 @@
  * 纯函数推荐逻辑 + LocalStorage 缓存管理
  */
 const RecommendationEngine = {
-  KEYS: {
-    CACHE: 'life_checklist_recommendations_cache'
-  },
-
   // 相关分类映射：用于扩展推荐广度
   RELATED_CATEGORIES: {
     '旅行': ['人生', '挑战', '美食'],
@@ -46,10 +42,17 @@ const RecommendationEngine = {
       });
     });
 
-    // 计算人生阶段
+    // 计算人生阶段（精确年龄：考虑今年生日是否已过）
     let lifeStage = '未知';
     if (birthDate) {
-      const age = new Date().getFullYear() - new Date(birthDate).getFullYear();
+      const today = new Date();
+      const birth = new Date(birthDate);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      const dayDiff = today.getDate() - birth.getDate();
+      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age--;
+      }
       if (age < 25) lifeStage = '探索期';
       else if (age < 35) lifeStage = '成长期';
       else if (age < 50) lifeStage = '收获期';
@@ -74,7 +77,7 @@ const RecommendationEngine = {
    * 读取缓存
    */
   _getCache() {
-    const data = localStorage.getItem(this.KEYS.CACHE);
+    const data = localStorage.getItem(StorageManager.KEYS.RECOMMENDATIONS_CACHE);
     if (data) {
       try {
         return JSON.parse(data);
@@ -91,7 +94,7 @@ const RecommendationEngine = {
    */
   _setCache(cache) {
     try {
-      localStorage.setItem(this.KEYS.CACHE, JSON.stringify(cache));
+      localStorage.setItem(StorageManager.KEYS.RECOMMENDATIONS_CACHE, JSON.stringify(cache));
     } catch (e) {
       console.warn('写入推荐缓存失败:', e);
     }
@@ -109,14 +112,15 @@ const RecommendationEngine = {
    */
   _scoreTemplates(ctx) {
     const cache = this._getCache();
+    const disliked = (cache && cache.disliked) || [];
     const lastCategories = (cache && cache.date === this._todayStr() && cache.items)
-      ? cache.items.map(item => {
+      ? Array.from(new Set(cache.items.map(item => {
           const t = TEMPLATE_LIBRARY.find(x => x.id === item.templateId);
           return t ? t.category : null;
-        }).filter(Boolean)
+        }).filter(Boolean)))
       : [];
 
-    const candidates = TEMPLATE_LIBRARY.filter(t => !ctx.addedTemplates.includes(t.id));
+    const candidates = TEMPLATE_LIBRARY.filter(t => !ctx.addedTemplates.includes(t.id) && !disliked.includes(t.id));
 
     const scored = candidates.map(template => {
       let score = 0;
@@ -216,7 +220,7 @@ const RecommendationEngine = {
     if (selected.length === 0) {
       selected = this.DEFAULT_RECOMMENDATIONS
         .map(id => ({ template: TEMPLATE_LIBRARY.find(t => t.id === id) }))
-        .filter(x => x.template && !ctx.addedTemplates.includes(x.template.id))
+        .filter(x => x.template && !ctx.addedTemplates.includes(x.template.id) && !((this._getCache() || {}).disliked || []).includes(x.template.id))
         .slice(0, limit);
     }
 
