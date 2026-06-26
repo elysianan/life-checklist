@@ -50,7 +50,8 @@ life-checklist/
 │   ├── timeline.js      # 人生轴
 │   ├── statistics.js    # 数据统计
 │   ├── aiService.js     # AI 文案生成层
-│   └── report.js        # AI 人生报告
+│   ├── report.js        # AI 人生报告
+│   └── recommendations.js # AI 智能推荐引擎
 └── README.md
 ```
 
@@ -70,6 +71,7 @@ life-checklist/
 - 人生必听 100 首歌
 - 极限运动挑战
 - 人生遗愿清单
+- AI 智能推荐：基于你的完成记录推荐可能感兴趣的清单
 
 ### 我的人生进度
 - 创建自定义清单
