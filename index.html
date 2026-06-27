@@ -601,6 +601,42 @@
       </div>
     </div>
 
+    <!-- ==================== 余生闹钟视图 ==================== -->
+    <div id="lifeclock-view" class="hidden">
+      <header class="lifeclock-header">
+        <button id="lifeclock-back-btn" class="back-btn">◀ 返回</button>
+        <h1 class="lifeclock-title">余生闹钟</h1>
+        <span class="lifeclock-header-spacer"></span>
+      </header>
+
+      <div class="lifeclock-card" id="lifeclock-card">
+        <p class="life-birth-hint hidden" id="life-birth-hint">👆 点这里设为你的生日</p>
+
+        <div class="life-clock-wrap" id="life-birth-trigger">
+          <svg id="life-clock-svg" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="92" class="life-clock-face"/>
+            <line id="life-hand-hour"   x1="100" y1="100" x2="100" y2="55"  class="life-hand-hour"/>
+            <line id="life-hand-minute" x1="100" y1="100" x2="100" y2="38"  class="life-hand-minute"/>
+            <line id="life-hand-second" x1="100" y1="100" x2="100" y2="30"  class="life-hand-second"/>
+            <circle cx="100" cy="100" r="5" class="life-clock-center"/>
+          </svg>
+        </div>
+
+        <p class="life-age-line">
+          你 <span id="life-age-value">0.00000000</span> 岁了
+        </p>
+
+        <p class="life-events-caption">余生还可以</p>
+        <div class="life-events-grid" id="life-events-grid"></div>
+      </div>
+
+      <div class="lifeclock-actions">
+        <button id="life-share-btn" class="life-action-btn">⬆ 分享</button>
+        <button id="life-save-btn" class="life-action-btn">保存</button>
+      </div>
+      <button id="life-retire-setting" class="life-retire-link">设置退休年龄</button>
+    </div>
+
   </div>
 
   <!-- ==================== 底部导航栏 ==================== -->
@@ -608,6 +644,10 @@
     <div class="nav-item active" data-view="home">
       <span class="nav-icon">🏠</span>
       <span class="nav-label">首页</span>
+    </div>
+    <div class="nav-item" data-view="lifeclock">
+      <span class="nav-icon">⏰</span>
+      <span class="nav-label">余生</span>
     </div>
     <div class="nav-item" data-view="lists">
       <span class="nav-icon">📋</span>
