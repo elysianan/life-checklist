@@ -210,5 +210,51 @@ const AIService = {
       console.warn('AI 润色推荐理由失败，降级规则引擎:', e.message);
       return { source: 'rule', text: baseReason, degraded: true };
     }
+  },
+
+  /**
+   * 解析大模型返回的路线图 JSON，失败抛错
+   */
+  _parseRoadmapJSON(text) {
+    if (!text) throw new Error('空响应');
+    let clean = text.trim();
+    // 去掉可能的 markdown 代码块
+    if (clean.startsWith('```')) {
+      clean = clean.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+    }
+    const parsed = JSON.parse(clean);
+
+    if (!Array.isArray(parsed.phases) || parsed.phases.length === 0) {
+      throw new Error('phases 格式错误');
+    }
+    parsed.phases.forEach((p, i) => {
+      if (!p.title || !Array.isArray(p.tasks) || p.tasks.length === 0) {
+        throw new Error(`阶段 ${i + 1} 格式错误`);
+      }
+    });
+
+    // 规整 category 到白名单
+    const validCategories = ['旅行', '阅读', '成长', '美食', '影视', '音乐', '挑战', '人生', '情感', '体验', '自定义'];
+    if (!validCategories.includes(parsed.category)) {
+      parsed.category = '自定义';
+    }
+
+    return parsed;
+  },
+
+  /**
+   * 调用大模型生成目标路线图
+   * @returns {Promise<{source:'api', goal:string, duration:string, category:string, emoji:string, phases:Array, degraded:boolean}>}
+   */
+  async generateGoalRoadmap(goalText, duration) {
+    const cfg = SettingsManager.getAIConfig();
+    const prompt = GoalBreakdownEngine.buildPrompt(goalText, duration);
+    const text = await this.callRealAPIWithPrompt(prompt, cfg, { maxTokens: 800, temperature: 0.7 });
+    const roadmap = this._parseRoadmapJSON(text);
+    roadmap.source = 'api';
+    roadmap.goal = roadmap.goal || goalText;
+    roadmap.duration = roadmap.duration || duration;
+    roadmap.degraded = false;
+    return roadmap;
   }
 };
