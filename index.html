@@ -61,81 +61,14 @@
         </div>
       </header>
 
-      <!-- 连续打卡卡片 -->
+      <!-- 余生闹钟入口卡片 -->
       <section class="mb-6">
-        <div class="streak-card">
-          <div class="streak-icon">🔥</div>
-          <div class="streak-info">
-            <div class="streak-main">
-              <span class="streak-number" id="streak-current">0</span>
-              <span class="streak-unit">天</span>
-            </div>
-            <div class="streak-sub">
-              连续打卡 · 最高 <span id="streak-longest">0</span> 天
-            </div>
+        <div class="home-life-entry" id="home-life-entry">
+          <div>
+            <p class="home-life-entry-title">你 <span id="home-life-age">--</span> 岁了</p>
+            <p class="home-life-entry-sub">看看余生还能体验多少美好 →</p>
           </div>
-          <div class="streak-status pending" id="streak-status">
-            ⏰ 今日还未打卡
-          </div>
-        </div>
-      </section>
-
-      <!-- 人生进度条模块（环形） -->
-      <section class="mb-6">
-        <div class="bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm">
-          <!-- 标题和输入 -->
-          <div class="flex items-center justify-between mb-5">
-            <h2 class="text-lg font-semibold text-apple-dark dark:text-white">
-              你的人生已走过
-            </h2>
-            <div class="flex items-center gap-2">
-              <label for="birth-date" class="text-xs text-apple-gray">
-                出生日期
-              </label>
-              <input
-                type="date"
-                id="birth-date"
-                class="text-sm bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-1.5 text-apple-dark dark:text-white border-0 focus:ring-2 focus:ring-apple-blue"
-              >
-            </div>
-          </div>
-
-          <!-- 环形进度条 - 更大更突出 -->
-          <div class="circular-progress-large">
-            <svg viewBox="0 0 100 100">
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:#34c759;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#30d158;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <circle class="progress-circle-bg" cx="50" cy="50" r="40"/>
-              <circle id="life-progress-circle" class="progress-circle" cx="50" cy="50" r="40"/>
-            </svg>
-            <div class="progress-center">
-              <div>
-                <span id="life-progress-percent" class="progress-percent-large">0</span>
-                <span class="progress-percent-symbol-large">%</span>
-              </div>
-              <p class="progress-label-large">人生进度</p>
-            </div>
-          </div>
-
-          <!-- 统计卡片 -->
-          <div class="stats-container">
-            <div class="stat-card">
-              <div class="stat-value" id="total-completed">0</div>
-              <div class="stat-label">已完成</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value" id="total-tasks">0</div>
-              <div class="stat-label">总任务</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value">80</div>
-              <div class="stat-label">预期寿命</div>
-            </div>
-          </div>
+          <span class="home-life-entry-arrow">⏰</span>
         </div>
       </section>
 
@@ -145,27 +78,6 @@
           <div class="quote-icon">💡</div>
           <p class="quote-text" id="daily-quote">人生就像一场旅行，不必在乎目的地，在乎的是沿途的风景以及看风景的心情。</p>
           <p class="quote-author">— 余秋雨</p>
-        </div>
-      </section>
-
-      <!-- 快速统计 -->
-      <section class="mb-6">
-        <div class="quick-stats">
-          <div class="quick-stat-item">
-            <span class="quick-stat-emoji">📅</span>
-            <span class="quick-stat-value" id="days-lived">0</span>
-            <span class="quick-stat-label">已活天数</span>
-          </div>
-          <div class="quick-stat-item">
-            <span class="quick-stat-emoji">⏰</span>
-            <span class="quick-stat-value" id="days-left">0</span>
-            <span class="quick-stat-label">剩余天数</span>
-          </div>
-          <div class="quick-stat-item">
-            <span class="quick-stat-emoji">🎯</span>
-            <span class="quick-stat-value" id="today-completed">0</span>
-            <span class="quick-stat-label">今日完成</span>
-          </div>
         </div>
       </section>
 

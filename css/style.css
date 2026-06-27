@@ -31,6 +31,19 @@ body {
   display: none !important;
 }
 
+/* ==================== 余生闹钟入口卡片 ==================== */
+
+.home-life-entry {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f5f5f0; border-radius: 20px; padding: 18px 20px; cursor: pointer;
+}
+.home-life-entry-title { font-size: 18px; font-weight: 600; color: #1d1d1f; }
+#home-life-age { color: #ff3b30; }
+.home-life-entry-sub { font-size: 13px; color: #9b9b9b; margin-top: 4px; }
+.home-life-entry-arrow { font-size: 24px; }
+.dark .home-life-entry { background: #1a1a1a; }
+.dark .home-life-entry-title { color: #fff; }
+
 /* ==================== 环形进度条 ==================== */
 
 .circular-progress {

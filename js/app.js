@@ -38,9 +38,6 @@ function initApp() {
  * 绑定全局事件
  */
 function bindEvents() {
-  const birthDateInput = document.getElementById('birth-date');
-  birthDateInput.addEventListener('change', handleBirthDateChange);
-
   document.getElementById('back-btn').addEventListener('click', showListsPage);
   document.getElementById('ach-back-btn').addEventListener('click', showHomePage);
   document.getElementById('stats-back-btn').addEventListener('click', showHomePage);
@@ -83,39 +80,6 @@ function bindEvents() {
 }
 
 /**
- * 处理出生日期变更
- */
-function handleBirthDateChange(e) {
-  const dateStr = e.target.value;
-  if (dateStr) {
-    StorageManager.setBirthDate(dateStr);
-    AppState.birthDate = dateStr;
-    updateLifeProgress();
-  }
-}
-
-/**
- * 更新人生进度
- */
-function updateLifeProgress() {
-  const progress = StorageManager.calculateLifeProgress(AppState.birthDate);
-
-  const progressCircle = document.getElementById('life-progress-circle');
-  if (progressCircle) {
-    AnimationManager.animateCircularProgress(progressCircle, progress);
-  }
-
-  const percentElement = document.getElementById('life-progress-percent');
-  if (percentElement) {
-    const currentValue = parseFloat(percentElement.textContent) || 0;
-    AnimationManager.animateFloatNumber(percentElement, currentValue, Math.round(progress * 10) / 10, 1000);
-  }
-
-  updateOverallStats();
-  updateQuickStats();
-}
-
-/**
  * 更新总体统计
  */
 function updateOverallStats() {
@@ -134,37 +98,19 @@ function updateOverallStats() {
 }
 
 /**
- * 更新快速统计
- */
-function updateQuickStats() {
-  if (!AppState.birthDate) return;
-
-  const birthDate = new Date(AppState.birthDate);
-  const today = new Date();
-
-  const livedDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
-  document.getElementById('days-lived').textContent = livedDays.toLocaleString();
-
-  const totalDays = 80 * 365.25;
-  const leftDays = Math.max(0, Math.floor(totalDays - livedDays));
-  document.getElementById('days-left').textContent = leftDays.toLocaleString();
-
-  const todayCompleted = StorageManager.getTodayCompleted();
-  document.getElementById('today-completed').textContent = todayCompleted;
-}
-
-/**
  * 渲染首页
  */
 function renderHomePage() {
-  const birthDateInput = document.getElementById('birth-date');
-  if (AppState.birthDate) {
-    birthDateInput.value = AppState.birthDate;
+  // 渲染余生入口卡片
+  const ageEl = document.getElementById('home-life-age');
+  if (ageEl) {
+    const birth = LifeClockUI.getEffectiveBirthDate();
+    ageEl.textContent = LifeClockEngine.calcAge(birth, Date.now()).toFixed(2);
   }
+  const entry = document.getElementById('home-life-entry');
+  if (entry) entry.onclick = showLifeClockPage;
 
-  updateLifeProgress();
   updateDailyQuote();
-  updateStreakDisplay();
   updateNavigation('home');
 }
 
