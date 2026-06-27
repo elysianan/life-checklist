@@ -13,7 +13,9 @@ const StorageManager = {
     ADDED_TEMPLATES: 'life_checklist_added_templates',
     STREAK_DATA: 'life_checklist_streak_data',
     LAST_VISIT: 'life_checklist_last_visit',
-    RECOMMENDATIONS_CACHE: 'life_checklist_recommendations_cache'
+    RECOMMENDATIONS_CACHE: 'life_checklist_recommendations_cache',
+    LIFE_EXPECTANCY: 'life_checklist_life_expectancy',
+    RETIRE_AGE: 'life_checklist_retire_age'
   },
 
   getBirthDate() {
@@ -22,6 +24,24 @@ const StorageManager = {
 
   setBirthDate(dateStr) {
     localStorage.setItem(this.KEYS.BIRTH_DATE, dateStr);
+  },
+
+  getLifeExpectancy() {
+    const v = parseInt(localStorage.getItem(this.KEYS.LIFE_EXPECTANCY), 10);
+    return Number.isFinite(v) && v > 0 ? v : DEFAULT_LIFE_EXPECTANCY;
+  },
+
+  setLifeExpectancy(years) {
+    localStorage.setItem(this.KEYS.LIFE_EXPECTANCY, String(years));
+  },
+
+  getRetireAge() {
+    const v = parseInt(localStorage.getItem(this.KEYS.RETIRE_AGE), 10);
+    return Number.isFinite(v) && v > 0 ? v : DEFAULT_RETIRE_AGE;
+  },
+
+  setRetireAge(age) {
+    localStorage.setItem(this.KEYS.RETIRE_AGE, String(age));
   },
 
   getLists() {

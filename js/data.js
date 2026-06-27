@@ -259,8 +259,22 @@ const TEMPLATE_LIBRARY = [
   }
 ];
 
-// 默认寿命假设（岁）
-const DEFAULT_LIFE_EXPECTANCY = 80;
+// 默认寿命假设（岁）—— 用 100 让余生数字更乐观
+const DEFAULT_LIFE_EXPECTANCY = 100;
+
+// 默认退休年龄（岁）
+const DEFAULT_RETIRE_AGE = 60;
+
+// 余生事件配置：calc 返回展示文案（string 或 {emoji,text}）；可增删
+const LIFE_EVENTS = [
+  { key: 'worldcup', emoji: '🏆', calc: (ry) => `观看 ${Math.floor(ry / 4)} 届世界杯` },
+  { key: 'summer',   emoji: '🍦', calc: (ry) => `享受 ${Math.floor(ry)} 个夏天` },
+  { key: 'retire',   emoji: '🧍', calc: (ry, ctx) =>
+      ctx.ageYears >= ctx.retireAge
+        ? { emoji: '🌴', text: `已自由 ${Math.floor(ctx.ageYears - ctx.retireAge)} 年` }
+        : `还有 ${ctx.retireAge - Math.floor(ctx.ageYears)} 年退休` },
+  { key: 'weekend',  emoji: '🛌', calc: (ry) => `度过 ${Math.floor(ry * 52)} 个周末` }
+];
 
 // 格言数据
 const QUOTES = [
