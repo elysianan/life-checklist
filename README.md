@@ -51,7 +51,8 @@ life-checklist/
 │   ├── statistics.js    # 数据统计
 │   ├── aiService.js     # AI 文案生成层
 │   ├── report.js        # AI 人生报告
-│   └── recommendations.js # AI 智能推荐引擎
+│|   ├── goalBreakdown.js   # AI 目标拆解引擎
+|   └── goalBreakdownUI.js # AI 目标拆解 UI
 └── README.md
 ```
 
@@ -78,6 +79,7 @@ life-checklist/
 - 添加/编辑/删除任务
 - 任务优先级和笔记
 - 清单排序
+- AI 目标拆解：输入宏大目标，自动生成 3 阶段路线图并生成专属清单
 
 ### 人生轴
 - 自动记录完成的任务
