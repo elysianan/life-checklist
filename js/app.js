@@ -48,6 +48,8 @@ function bindEvents() {
   document.getElementById('template-back-btn').addEventListener('click', showHomePage);
   document.getElementById('timeline-back-btn').addEventListener('click', showHomePage);
 
+  document.getElementById('lifeclock-back-btn').addEventListener('click', showHomePage);
+
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
       const view = e.currentTarget.dataset.view;
@@ -58,6 +60,7 @@ function bindEvents() {
         case 'timeline': showTimelinePage(); break;
         case 'statistics': showStatisticsPage(); break;
         case 'profile': showProfilePage(); break;
+        case 'lifeclock': showLifeClockPage(); break;
       }
     });
   });
@@ -210,6 +213,27 @@ function updateDailyQuote() {
 }
 
 /**
+ * 显示余生闹钟页面
+ */
+function showLifeClockPage() {
+  AppState.currentView = 'lifeclock';
+
+  document.getElementById('home-view').classList.add('hidden');
+  document.getElementById('report-view').classList.add('hidden');
+  document.getElementById('lists-view').classList.add('hidden');
+  document.getElementById('templates-view').classList.add('hidden');
+  document.getElementById('timeline-view').classList.add('hidden');
+  document.getElementById('detail-view').classList.add('hidden');
+  document.getElementById('achievements-view').classList.add('hidden');
+  document.getElementById('statistics-view').classList.add('hidden');
+  document.getElementById('profile-view').classList.add('hidden');
+  document.getElementById('lifeclock-view').classList.remove('hidden');
+
+  LifeClockUI.show();
+  updateNavigation('lifeclock');
+}
+
+/**
  * 显示首页
  */
 function showHomePage() {
@@ -225,7 +249,9 @@ function showHomePage() {
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
   renderHomePage();
 }
 
@@ -245,7 +271,9 @@ function showListsPage() {
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
   renderListsPage();
   updateNavigation('lists');
 }
@@ -355,8 +383,10 @@ function showListDetail(listId) {
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.remove('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
+  document.getElementById('detail-view').classList.remove('hidden');
   renderListDetail(listId);
 }
 
@@ -609,7 +639,9 @@ function showTemplatesPage() {
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
   TemplateManager.renderTemplateLibrary();
   updateNavigation('templates');
 }
@@ -629,7 +661,9 @@ function showTimelinePage() {
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
   TimelineManager.renderTimelinePage();
   updateNavigation('timeline');
 }
@@ -648,8 +682,10 @@ function showAchievementsPage() {
   document.getElementById('detail-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.remove('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
+  document.getElementById('achievements-view').classList.remove('hidden');
   updateNavigation('achievements');
 
   const container = document.getElementById('achievement-wall');
@@ -678,8 +714,10 @@ function showStatisticsPage() {
   document.getElementById('detail-view').classList.add('hidden');
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.remove('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
+  document.getElementById('statistics-view').classList.remove('hidden');
   updateNavigation('statistics');
   StatisticsManager.renderStatisticsPage();
 }
@@ -698,8 +736,10 @@ function showProfilePage() {
   document.getElementById('detail-view').classList.add('hidden');
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.remove('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
 
+  LifeClockUI.stopTick();
+  document.getElementById('profile-view').classList.remove('hidden');
   updateNavigation('profile');
   ProfileManager.renderProfilePage();
 }
@@ -732,6 +772,9 @@ function showReportPage() {
   document.getElementById('achievements-view').classList.add('hidden');
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('profile-view').classList.add('hidden');
+  document.getElementById('lifeclock-view').classList.add('hidden');
+
+  LifeClockUI.stopTick();
   document.getElementById('report-view').classList.remove('hidden');
 }
 
