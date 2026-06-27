@@ -154,7 +154,7 @@ const AIService = {
    * 调用真实大模型处理自定义 prompt（OpenAI 兼容）
    * 15 秒超时
    */
-  async callRealAPIWithPrompt(prompt, config) {
+  async callRealAPIWithPrompt(prompt, config, options = {}) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15000);
     try {
@@ -170,8 +170,8 @@ const AIService = {
             { role: 'system', content: '你是一位温暖、真诚的人生记录助手。' },
             { role: 'user', content: prompt }
           ],
-          temperature: 0.8,
-          max_tokens: 80
+          temperature: options.temperature ?? 0.8,
+          max_tokens: options.maxTokens ?? 80
         }),
         signal: controller.signal
       });
