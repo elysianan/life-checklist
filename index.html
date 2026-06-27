@@ -688,7 +688,24 @@
   <script src="js/statistics.js"></script>
   <script src="js/report.js"></script>
   <script src="js/lifeClock.js"></script>
+  <script src="js/datePicker.js"></script>
   <script src="js/app.js"></script>
+
+  <!-- 日期选择器遮罩 -->
+  <div id="date-picker-mask" class="date-picker-mask hidden">
+    <div class="date-picker-card">
+      <div class="date-picker-bar">
+        <button id="date-picker-cancel" class="dp-btn">取消</button>
+        <button id="date-picker-confirm" class="dp-btn dp-confirm">确定</button>
+      </div>
+      <div class="date-picker-cols">
+        <ul class="dp-col" id="dp-year"></ul>
+        <ul class="dp-col" id="dp-month"></ul>
+        <ul class="dp-col" id="dp-day"></ul>
+      </div>
+      <div class="date-picker-units"><span>年</span><span>月</span><span>日</span></div>
+    </div>
+  </div>
 
 </body>
 </html>

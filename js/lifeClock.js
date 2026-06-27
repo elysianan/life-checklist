@@ -56,6 +56,16 @@ const LifeClockUI = {
     this.renderEvents();
     this.renderAge();
     this.startTick();
+
+    const trigger = document.getElementById('life-birth-trigger');
+    if (trigger) {
+      trigger.onclick = () => {
+        DatePickerManager.open(this.getEffectiveBirthDate(), (dateStr) => {
+          StorageManager.setBirthDate(dateStr);
+          this.show();   // 重渲染（演示提示消失、年龄/余生更新）
+        });
+      };
+    }
   },
 
   renderAge() {
