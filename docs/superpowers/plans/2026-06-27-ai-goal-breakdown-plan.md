@@ -900,7 +900,8 @@ const GoalBreakdownUIManager = {
     const newList = GoalBreakdownEngine.createListFromRoadmap(this.currentRoadmap);
     this.close();
 
-    // 刷新进度页
+    // 同步 AppState 并刷新进度页
+    AppState.lists = StorageManager.getLists();
     if (typeof renderListCards === 'function') renderListCards();
     if (typeof updateListsOverview === 'function') updateListsOverview();
     if (typeof updateOverallStats === 'function') updateOverallStats();
