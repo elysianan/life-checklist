@@ -385,8 +385,8 @@ function showListDetail(listId) {
   document.getElementById('profile-view').classList.add('hidden');
   document.getElementById('lifeclock-view').classList.add('hidden');
 
-  LifeClockUI.stopTick();
   document.getElementById('detail-view').classList.remove('hidden');
+  LifeClockUI.stopTick();
   renderListDetail(listId);
 }
 
@@ -684,8 +684,8 @@ function showAchievementsPage() {
   document.getElementById('profile-view').classList.add('hidden');
   document.getElementById('lifeclock-view').classList.add('hidden');
 
-  LifeClockUI.stopTick();
   document.getElementById('achievements-view').classList.remove('hidden');
+  LifeClockUI.stopTick();
   updateNavigation('achievements');
 
   const container = document.getElementById('achievement-wall');
@@ -716,8 +716,8 @@ function showStatisticsPage() {
   document.getElementById('profile-view').classList.add('hidden');
   document.getElementById('lifeclock-view').classList.add('hidden');
 
-  LifeClockUI.stopTick();
   document.getElementById('statistics-view').classList.remove('hidden');
+  LifeClockUI.stopTick();
   updateNavigation('statistics');
   StatisticsManager.renderStatisticsPage();
 }
@@ -738,8 +738,8 @@ function showProfilePage() {
   document.getElementById('statistics-view').classList.add('hidden');
   document.getElementById('lifeclock-view').classList.add('hidden');
 
-  LifeClockUI.stopTick();
   document.getElementById('profile-view').classList.remove('hidden');
+  LifeClockUI.stopTick();
   updateNavigation('profile');
   ProfileManager.renderProfilePage();
 }
