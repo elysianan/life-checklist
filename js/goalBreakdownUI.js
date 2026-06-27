@@ -156,6 +156,11 @@ const GoalBreakdownUIManager = {
 
     const roadmap = await GoalBreakdownEngine.generateRoadmap(text, duration);
     this.currentRoadmap = roadmap;
+
+    if (roadmap.degraded) {
+      CustomManager.showToast('AI 暂不可用，已用本地模板拆解');
+    }
+
     this.renderRoadmap(roadmap);
   },
 

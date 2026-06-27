@@ -100,6 +100,15 @@ code += `
   }));
   assert('未知 category 规整为自定义', unknownCat.category === '自定义');
 
+  let badPhases = false;
+  try {
+    AIService._parseRoadmapJSON(JSON.stringify({
+      goal: '测试', duration: '1年', category: '阅读', emoji: '📚',
+      phases: [{ title: '阶段一', timeLabel: '第1-3个月', tasks: ['任务1'] }]
+    }));
+  } catch (e) { badPhases = true; }
+  assert('phases 数量不等于3抛错', badPhases);
+
   __done(passed, failed);
 })();
 `;
