@@ -160,6 +160,22 @@ const ProfileManager = {
       item.addEventListener('click', () => this.handleSettingAction(setting.action));
       container.appendChild(item);
     });
+
+    const lifeExpItem = document.getElementById('setting-life-expectancy');
+    if (lifeExpItem) {
+      const valEl = document.getElementById('life-expectancy-value');
+      if (valEl) valEl.textContent = StorageManager.getLifeExpectancy() + ' 岁';
+      lifeExpItem.onclick = () => {
+        const cur = StorageManager.getLifeExpectancy();
+        const input = prompt('设置预期寿命（60~120）', String(cur));
+        if (input === null) return;
+        const v = parseInt(input, 10);
+        if (Number.isFinite(v) && v >= 60 && v <= 120) {
+          StorageManager.setLifeExpectancy(v);
+          if (valEl) valEl.textContent = v + ' 岁';
+        }
+      };
+    }
   },
 
   handleSettingAction(action) {

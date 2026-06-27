@@ -66,6 +66,19 @@ const LifeClockUI = {
         });
       };
     }
+    const retireBtn = document.getElementById('life-retire-setting');
+    if (retireBtn) {
+      retireBtn.onclick = () => {
+        const cur = StorageManager.getRetireAge();
+        const input = prompt('设置退休年龄（40~80）', String(cur));
+        if (input === null) return;
+        const v = parseInt(input, 10);
+        if (Number.isFinite(v) && v >= 40 && v <= 80) {
+          StorageManager.setRetireAge(v);
+          this.renderEvents();
+        }
+      };
+    }
   },
 
   renderAge() {
