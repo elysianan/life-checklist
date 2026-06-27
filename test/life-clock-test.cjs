@@ -42,6 +42,8 @@ code += `
   assert('设置后退休为 55', StorageManager.getRetireAge() === 55);
   StorageManager.setLifeExpectancy(0);
   assert('非法寿命(0)回退默认 100', StorageManager.getLifeExpectancy() === 100);
+  StorageManager.setRetireAge(0);
+  assert('非法退休(0)回退默认 60', StorageManager.getRetireAge() === 60);
 
   // ---- LIFE_EVENTS 配置 ----
   assert('LIFE_EVENTS 至少 4 项', Array.isArray(LIFE_EVENTS) && LIFE_EVENTS.length >= 4);
