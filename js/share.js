@@ -143,6 +143,40 @@ const ShareManager = {
     });
   },
 
+  // 截图余生闹钟卡片为 PNG 并下载
+  saveLifeClockImage() {
+    const element = document.getElementById('lifeclock-card');
+    if (!element) return;
+    const run = () => {
+      html2canvas(element, { backgroundColor: '#f5f5f0', scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = '余生闹钟_' + new Date().toISOString().slice(0, 10) + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    };
+    if (!window.html2canvas) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.onload = run;
+      script.onerror = () => this.showToast('图片生成失败，请重试');
+      document.head.appendChild(script);
+    } else {
+      run();
+    }
+  },
+
+  // 分享：优先系统分享，降级为保存图片
+  shareLifeClock() {
+    const age = document.getElementById('life-age-value');
+    const text = age ? `你 ${age.textContent} 岁了，余生还可以体验很多美好 ✨` : '余生闹钟';
+    if (navigator.share) {
+      navigator.share({ title: '余生闹钟', text }).catch(() => {});
+    } else {
+      this.saveLifeClockImage();
+    }
+  },
+
   showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'share-toast';
