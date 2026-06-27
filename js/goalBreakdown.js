@@ -234,7 +234,6 @@ const GoalBreakdownEngine = {
 
     lists.push(newList);
     StorageManager.setLists(lists);
-    AppState.lists = lists;
     return newList;
   }
 };
