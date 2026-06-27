@@ -72,12 +72,15 @@ code += `
   // ---- AI 降级 ----
   const noKeyRoadmap = await GoalBreakdownEngine.generateRoadmap('成为插画师', '1年');
   assert('未配置 Key 时返回 rule', noKeyRoadmap.source === 'rule');
+  assert('未配置 Key 时标记降级', noKeyRoadmap.degraded === true);
 
   // ---- _parseRoadmapJSON ----
   const validJSON = JSON.stringify({
     goal: '测试', duration: '1年', category: '阅读', emoji: '📚',
     phases: [
-      { title: '阶段一', timeLabel: '第1-3个月', tasks: ['任务1'] }
+      { title: '阶段一', timeLabel: '第1-3个月', tasks: ['任务1'] },
+      { title: '阶段二', timeLabel: '第4-8个月', tasks: ['任务2'] },
+      { title: '阶段三', timeLabel: '第9-12个月', tasks: ['任务3'] }
     ]
   });
   const parsed = AIService._parseRoadmapJSON(validJSON);
@@ -89,7 +92,11 @@ code += `
 
   let unknownCat = AIService._parseRoadmapJSON(JSON.stringify({
     goal: '测试', duration: '1年', category: '外星人分类', emoji: '😂',
-    phases: [{ title: '阶段一', timeLabel: '', tasks: ['任务1'] }]
+    phases: [
+      { title: '阶段一', timeLabel: '', tasks: ['任务1'] },
+      { title: '阶段二', timeLabel: '', tasks: ['任务2'] },
+      { title: '阶段三', timeLabel: '', tasks: ['任务3'] }
+    ]
   }));
   assert('未知 category 规整为自定义', unknownCat.category === '自定义');
 

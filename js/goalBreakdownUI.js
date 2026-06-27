@@ -32,8 +32,8 @@ const GoalBreakdownUIManager = {
             <label class="goal-label">期限</label>
             <div class="goal-duration-chips">
               <button class="goal-duration-chip" data-duration="3个月">3 个月</button>
-              <button class="goal-duration-chip active" data-duration="6个月">6 个月</button>
-              <button class="goal-duration-chip" data-duration="1年">1 年</button>
+              <button class="goal-duration-chip" data-duration="6个月">6 个月</button>
+              <button class="goal-duration-chip active" data-duration="1年">1 年</button>
               <button class="goal-duration-chip" data-duration="自定义">自定义</button>
             </div>
             <input id="goal-custom-duration" type="text" class="goal-input hidden" placeholder="例如：8 个月">
@@ -210,7 +210,7 @@ const GoalBreakdownUIManager = {
     this.close();
 
     // 直接更新 AppState.lists，避免重新从 Storage 读取
-    AppState.lists.push(newList);
+    AppState.lists = StorageManager.getLists();
     if (typeof renderListCards === 'function') renderListCards();
     if (typeof updateListsOverview === 'function') updateListsOverview();
     if (typeof updateOverallStats === 'function') updateOverallStats();

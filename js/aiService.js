@@ -224,7 +224,7 @@ const AIService = {
     }
     const parsed = JSON.parse(clean);
 
-    if (!Array.isArray(parsed.phases) || parsed.phases.length === 0) {
+    if (!Array.isArray(parsed.phases) || parsed.phases.length !== 3) {
       throw new Error('phases 格式错误');
     }
     parsed.phases.forEach((p, i) => {

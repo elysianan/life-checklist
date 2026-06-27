@@ -51,8 +51,8 @@ life-checklist/
 │   ├── statistics.js    # 数据统计
 │   ├── aiService.js     # AI 文案生成层
 │   ├── report.js        # AI 人生报告
-│|   ├── goalBreakdown.js   # AI 目标拆解引擎
-|   └── goalBreakdownUI.js # AI 目标拆解 UI
+│   ├── goalBreakdown.js   # AI 目标拆解引擎
+│   └── goalBreakdownUI.js # AI 目标拆解 UI
 └── README.md
 ```
 

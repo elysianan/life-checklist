@@ -178,7 +178,9 @@ const GoalBreakdownEngine = {
   async generateRoadmap(goalText, duration) {
     const cfg = SettingsManager.getAIConfig();
     if (!cfg.enabled || !cfg.apiKey) {
-      return this.buildLocalRoadmap(goalText, duration);
+      const local = this.buildLocalRoadmap(goalText, duration);
+      local.degraded = true;
+      return local;
     }
     try {
       const roadmap = await AIService.generateGoalRoadmap(goalText, duration);
