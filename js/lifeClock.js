@@ -14,7 +14,7 @@ const LifeClockEngine = {
   // 余生事件列表，每项 {emoji, text}
   calcEvents(ctx) {
     const ageYears = this.calcAge(ctx.birthDate, ctx.now);
-    const remainingYears = Math.max(0, Math.round(ctx.lifeExpectancy - ageYears));
+    const remainingYears = Math.max(0, ctx.lifeExpectancy - Math.floor(ageYears));
     if (remainingYears <= 0) {
       return [{ emoji: '🎁', text: '每一天都是赚到' }];
     }
