@@ -27,6 +27,11 @@ function initApp() {
   renderHomePage();
   bindEvents();
   checkAndShowAchievements();
+
+  // 初始化 AI 目标拆解 UI
+  if (typeof GoalBreakdownUIManager !== 'undefined') {
+    GoalBreakdownUIManager.init();
+  }
 }
 
 /**
