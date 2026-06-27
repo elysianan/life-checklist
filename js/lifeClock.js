@@ -139,6 +139,6 @@ const LifeClockUI = {
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) LifeClockUI.stopTick();
-    else if (AppState && AppState.currentView === 'lifeclock') LifeClockUI.startTick();
+    else if (typeof AppState !== 'undefined' && AppState.currentView === 'lifeclock') LifeClockUI.startTick();
   });
 }

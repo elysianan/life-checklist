@@ -159,7 +159,10 @@ const ShareManager = {
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
       script.onload = run;
-      script.onerror = () => this.showToast('图片生成失败，请重试');
+      script.onerror = () => {
+        this.showToast('图片生成失败，请重试');
+        script.remove();
+      };
       document.head.appendChild(script);
     } else {
       run();

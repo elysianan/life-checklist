@@ -1,0 +1,21 @@
+/* ===== 日期滚轮选择器 ===== */
+.date-picker-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,.35);
+  display: flex; align-items: flex-end; z-index: 1000;
+}
+.date-picker-card { width: 100%; background: #fff; border-radius: 20px 20px 0 0; padding-bottom: 12px; }
+.date-picker-bar { display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #eee; }
+.dp-btn { background: none; border: none; font-size: 16px; color: #8e8e93; }
+.dp-confirm { color: #007aff; font-weight: 600; }
+.date-picker-cols { display: flex; height: 180px; position: relative; }
+.dp-col {
+  flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory;
+  text-align: center; margin: 0; padding: 72px 0; list-style: none;
+  scrollbar-width: none;
+}
+.dp-col::-webkit-scrollbar { display: none; }
+.dp-col li { height: 36px; line-height: 36px; scroll-snap-align: center; font-size: 18px; color: #1d1d1f; }
+.date-picker-units { display: flex; }
+.date-picker-units span { flex: 1; text-align: center; font-size: 13px; color: #9b9b9b; }
+.dark .date-picker-card { background: #1c1c1e; }
+.dark .dp-col li { color: #fff; }
