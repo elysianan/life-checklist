@@ -607,11 +607,19 @@ function showListDetail(listId) {
 
 // 详情页编辑态
 let detailEditMode = false;
+// 记录当前详情页所属清单 id，用于切换清单时重置编辑态
+let detailCurrentListId = null;
 
 /**
  * 渲染清单详情
  */
 function renderListDetail(listId) {
+  // 切换清单时重置编辑态；编辑按钮点击时 listId 不变，不重置
+  if (detailCurrentListId !== null && detailCurrentListId !== listId) {
+    detailEditMode = false;
+  }
+  detailCurrentListId = listId;
+
   const list = AppState.lists.find(l => l.id === listId);
   if (!list) return;
 
@@ -656,6 +664,14 @@ function renderTaskTags(list) {
     const tag = createTaskTag(list.id, task, list.color);
     container.appendChild(tag);
   });
+
+  // 空清单且非编辑态时显示空状态提示
+  if (list.tasks.length === 0 && !detailEditMode) {
+    const emptyHint = document.createElement('div');
+    emptyHint.className = 'detail-empty-tags';
+    emptyHint.textContent = '还没有任务，点「编辑」添加吧';
+    container.appendChild(emptyHint);
+  }
 
   // 编辑态末尾添加「+添加」标签
   if (detailEditMode) {
