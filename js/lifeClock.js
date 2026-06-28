@@ -68,21 +68,48 @@ const LifeClockUI = {
     }
     const retireBtn = document.getElementById('life-retire-setting');
     if (retireBtn) {
-      retireBtn.onclick = () => {
-        const cur = StorageManager.getRetireAge();
-        const input = prompt('设置退休年龄（40~80）', String(cur));
-        if (input === null) return;
-        const v = parseInt(input, 10);
-        if (Number.isFinite(v) && v >= 40 && v <= 80) {
-          StorageManager.setRetireAge(v);
-          this.renderEvents();
-        }
-      };
+      retireBtn.onclick = () => this._showRetireModal();
     }
     const shareBtn = document.getElementById('life-share-btn');
     const saveBtn = document.getElementById('life-save-btn');
     if (shareBtn) shareBtn.onclick = () => ShareManager.shareLifeClock();
     if (saveBtn) saveBtn.onclick = () => ShareManager.saveLifeClockImage();
+  },
+
+  // 退休年龄设置弹窗（替代浏览器 prompt，统一 App 内样式）
+  _showRetireModal() {
+    const cur = StorageManager.getRetireAge();
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-content" style="max-width: 300px;">
+        <h3>设置退休年龄</h3>
+        <p class="modal-desc">请输入计划退休年龄（40~80 岁）</p>
+        <input type="number" id="retire-age-input" class="form-input" value="${cur}" min="40" max="80" style="margin: 0.5rem 0 1rem;">
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel">取消</button>
+          <button class="modal-btn modal-btn-confirm">确定</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const close = () => overlay.remove();
+    overlay.querySelector('.modal-btn-cancel').onclick = close;
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.querySelector('.modal-btn-confirm').onclick = () => {
+      const input = overlay.querySelector('#retire-age-input');
+      const v = parseInt(input.value, 10);
+      if (Number.isFinite(v) && v >= 40 && v <= 80) {
+        StorageManager.setRetireAge(v);
+        this.renderEvents();
+        close();
+      } else {
+        // 非法输入：红框提示且不关闭
+        input.style.borderColor = '#FF3B30';
+        input.focus();
+      }
+    };
   },
 
   renderAge() {
