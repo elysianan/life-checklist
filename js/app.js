@@ -14,7 +14,8 @@ const VIEWS = {
   home:         { nav: 'home',         onShow: renderHomePage },
   templates:    { nav: 'templates',    onShow: () => TemplateManager.renderTemplateLibrary() },
   timeline:     { nav: 'timeline',     onShow: () => TimelineManager.renderTimelinePage() },
-  lifeprogress: { nav: 'lifeprogress', onShow: () => { /* 阶段1占位，阶段3实现 */ } },
+  lifeprogress: { nav: 'lifeprogress', onShow: () => LifeProgressManager.renderList() },
+  lifeprogressEdit: { nav: 'lifeprogress', onShow: (p) => LifeProgressManager.renderEdit(p) },
   profile:      { nav: 'profile',      onShow: () => ProfileManager.renderProfilePage() },
   detail:       { nav: 'home',        onShow: (id) => renderListDetail(id) },
   lifeclock:    { nav: null,          onShow: () => LifeClockUI.show() },
@@ -136,10 +137,6 @@ function bindEvents() {
         case 'lifeprogress': showView('lifeprogress'); break;
       }
     });
-  });
-
-  document.getElementById('share-btn').addEventListener('click', () => {
-    ShareManager.showShareModal();
   });
 
   document.getElementById('search-btn').addEventListener('click', () => {

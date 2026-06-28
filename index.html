@@ -240,19 +240,15 @@
 
     </div>
 
-    <!-- ==================== 人生进度占位视图 ==================== -->
+    <!-- ==================== 人生进度列表视图（阶段3）==================== -->
     <div id="lifeprogress-view" class="hidden">
-      <header class="pt-6 pb-4">
-        <div class="flex items-center justify-between">
-          <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
-            人生进度
-          </h1>
-        </div>
-      </header>
-      <div class="flex flex-col items-center justify-center py-20 text-apple-gray">
-        <div class="text-6xl mb-4">⏳</div>
-        <p class="text-lg font-medium">人生进度功能开发中</p>
-        <p class="text-sm mt-2">敬请期待阶段 3</p>
+      <!-- 内容由 LifeProgressManager.renderList() 动态渲染 -->
+    </div>
+
+    <!-- ==================== 人生进度·添加/编辑视图（阶段3）==================== -->
+    <div id="lifeprogressEdit-view" class="hidden">
+      <div id="lifeprogressEdit-inner">
+        <!-- 内容由 LifeProgressManager.renderEdit() 动态渲染 -->
       </div>
     </div>
 
@@ -650,6 +646,7 @@
   <script src="js/report.js"></script>
   <script src="js/lifeClock.js"></script>
   <script src="js/datePicker.js"></script>
+  <script src="js/lifeProgress.js"></script>
   <script src="js/app.js"></script>
 
   <!-- 日期选择器遮罩 -->

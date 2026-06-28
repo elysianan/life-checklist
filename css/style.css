@@ -3635,8 +3635,137 @@ body {
 .dark .date-picker-card { background: #1c1c1e; }
 .dark .dp-col li { color: #fff; }
 
-/* ===== 余生闹钟页 ===== */
-#lifeclock-view { padding: 0 16px 96px; }
+/* ===== 人生进度页 ===== */
+.lp-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.lp-card:active {
+  transform: scale(0.98);
+}
+@media (prefers-color-scheme: dark) {
+  .lp-card {
+    background: #1c1c1e;
+  }
+}
+
+.lp-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.lp-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+@media (prefers-color-scheme: dark) {
+  .lp-card-name {
+    color: #f5f5f7;
+  }
+}
+
+.lp-card-age {
+  font-size: 0.875rem;
+  color: #86868b;
+  font-weight: 500;
+}
+
+.lp-progress-wrap {
+  position: relative;
+  height: 24px;
+  background: #e5e5ea;
+  border-radius: 12px;
+  overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+  .lp-progress-wrap {
+    background: #2c2c2e;
+  }
+}
+
+.lp-progress-bar {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.5s ease;
+}
+
+.lp-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  text-shadow: 0 0 2px rgba(255,255,255,0.8);
+}
+@media (prefers-color-scheme: dark) {
+  .lp-progress-text {
+    color: #f5f5f7;
+    text-shadow: 0 0 2px rgba(0,0,0,0.8);
+  }
+}
+
+/* ===== 内联滚轮选择器 ===== */
+.dp-inline-cols {
+  display: flex;
+  height: 180px;
+  position: relative;
+  background: #f5f5f7;
+  border-radius: 12px;
+  overflow: hidden;
+}
+@media (prefers-color-scheme: dark) {
+  .dp-inline-cols {
+    background: #2c2c2e;
+  }
+}
+
+.dp-inline-col {
+  flex: 1;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  text-align: center;
+  margin: 0;
+  padding: 72px 0;
+  list-style: none;
+  scrollbar-width: none;
+}
+.dp-inline-col::-webkit-scrollbar {
+  display: none;
+}
+.dp-inline-col li {
+  height: 36px;
+  line-height: 36px;
+  scroll-snap-align: center;
+  font-size: 18px;
+  color: #1d1d1f;
+}
+@media (prefers-color-scheme: dark) {
+  .dp-inline-col li {
+    color: #fff;
+  }
+}
+
+.dp-inline-units {
+  display: flex;
+  margin-top: 4px;
+}
+.dp-inline-units span {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  color: #9b9b9b;
+}
+
 .lifeclock-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 0;
