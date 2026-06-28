@@ -218,24 +218,8 @@ const StorageManager = {
 
           // 更新连续打卡
           this.checkInToday();
-
-          // 添加到人生轴
-          this.addTimelineEvent({
-            id: 'event_' + Date.now(),
-            date: new Date().toISOString(),
-            emoji: list.emoji,
-            title: `完成「${list.title}」: ${task.text}`,
-            color: list.color,
-            listId: listId,
-            taskId: taskId
-          });
         } else {
           task.completedDate = '';
-
-          // 从人生轴移除相关事件
-          const timeline = this.getTimeline();
-          const filtered = timeline.filter(e => !(e.listId === listId && e.taskId === taskId));
-          this.setTimeline(filtered);
         }
 
         this.setLists(lists);
@@ -409,6 +393,22 @@ const StorageManager = {
     if (!this.getLists()) {
       const lists = JSON.parse(JSON.stringify(DEFAULT_LISTS));
       this.setLists(lists);
+    }
+    // 一次性迁移旧时间轴数据
+    this._migrateTimelineOnce();
+  },
+
+  _migrateTimelineOnce() {
+    if (this.isTimelineMigrated()) return;
+    try {
+      const old = this.getTimeline();
+      if (old.length > 0 && old[0] && ('date' in old[0] || 'title' in old[0])) {
+        const migrated = TimelineEngine.migrate(old);
+        this.setTimeline(migrated);
+      }
+      this.setTimelineMigrated();
+    } catch (e) {
+      console.error('时间轴迁移失败:', e);
     }
   }
 };

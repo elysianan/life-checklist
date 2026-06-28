@@ -255,33 +255,44 @@
     <!-- ==================== 人生轴页视图 ==================== -->
     <div id="timeline-view" class="hidden">
 
-      <!-- 返回按钮 -->
-      <div class="pt-6 pb-4">
-        <button
-          id="timeline-back-btn"
-          class="flex items-center gap-2 text-apple-blue font-medium"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-          返回
-        </button>
-      </div>
-
-      <!-- 头部 -->
-      <header class="mb-4">
-        <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
-          人生轴
-        </h1>
-        <p class="text-apple-gray text-sm">
-          记录人生的每个精彩瞬间 · 已完成 <span id="timeline-count">0</span> 件事
-        </p>
+      <!-- 头部标题 + 分享 -->
+      <header class="pt-6 pb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+              人生时间轴
+            </h1>
+            <p class="text-apple-gray text-sm">
+              共 <span id="timeline-count">0</span> 件事
+            </p>
+          </div>
+          <button id="timeline-share-btn" class="w-10 h-10 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-apple-gray">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+          </button>
+        </div>
       </header>
+
+      <!-- 布局切换 -->
+      <div class="flex items-center gap-2 mb-4">
+        <button id="timeline-layout-single" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 transition-all">单列</button>
+        <button id="timeline-layout-double" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 transition-all">双侧</button>
+      </div>
 
       <!-- 时间线容器 -->
       <section id="timeline-container">
         <!-- 时间线将通过 JavaScript 动态生成 -->
       </section>
+
+      <!-- 浮动添加按钮 -->
+      <button id="timeline-add-btn" class="fixed bottom-24 right-4 w-14 h-14 bg-apple-blue text-white rounded-full shadow-lg flex items-center justify-center text-2xl z-50">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
 
     </div>
 

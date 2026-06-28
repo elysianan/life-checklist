@@ -1,23 +1,90 @@
 /**
- * 人生轴模块
+ * 人生轴模块（手动大事记）
+ * 纯逻辑与渲染分离：TimelineEngine + TimelineManager
  */
 
+// ==================== 纯逻辑引擎 ====================
+const TimelineEngine = {
+  /**
+   * 一次性迁移：旧结构 {id, date, title, ...} → 新 {id, year, text}
+   * 过滤无合法 date 或 title 的脏数据
+   */
+  migrate(oldArr) {
+    if (!Array.isArray(oldArr)) return [];
+    let seq = 1;
+    return oldArr.reduce((acc, item) => {
+      if (!item || typeof item !== 'object') return acc;
+      const dateVal = item.date;
+      const titleVal = item.title;
+      if (!dateVal || !titleVal) return acc;
+      const d = new Date(dateVal);
+      if (isNaN(d.getTime())) return acc;
+      acc.push({
+        id: 'e_' + (seq++),
+        year: d.getFullYear(),
+        text: String(titleVal)
+      });
+      return acc;
+    }, []);
+  },
+
+  /**
+   * 按年份升序排序，返回新数组，不修改原数组
+   */
+  sortByYear(events) {
+    if (!Array.isArray(events)) return [];
+    return [...events].sort((a, b) => a.year - b.year);
+  },
+
+  /**
+   * 计算年份跨度，空数组返回 null
+   */
+  yearSpan(events) {
+    if (!Array.isArray(events) || events.length === 0) return null;
+    const years = events.map(e => e.year);
+    return { min: Math.min(...years), max: Math.max(...years) };
+  },
+
+  /**
+   * 校验事件：年份 1900 ~ 当前年+100，文本非空（去空格后）
+   */
+  validateEvent(year, text) {
+    const y = Number(year);
+    const currentYear = new Date().getFullYear();
+    if (!Number.isFinite(y) || y < 1900 || y > currentYear + 100) return false;
+    if (typeof text !== 'string' || text.trim().length === 0) return false;
+    return true;
+  }
+};
+
+// ==================== 渲染管理器 ====================
 const TimelineManager = {
+  _nextId: 1,
+
   renderTimelinePage() {
     const container = document.getElementById('timeline-container');
     if (!container) return;
 
-    const timeline = StorageManager.getTimeline();
+    const events = StorageManager.getTimeline();
+    const sorted = TimelineEngine.sortByYear(events);
 
-    document.getElementById('timeline-count').textContent = timeline.length;
+    // 更新计数
+    const countEl = document.getElementById('timeline-count');
+    if (countEl) countEl.textContent = sorted.length;
 
-    if (timeline.length === 0) {
+    // 更新布局切换按钮状态
+    const layout = this.getLayout();
+    const singleBtn = document.getElementById('timeline-layout-single');
+    const doubleBtn = document.getElementById('timeline-layout-double');
+    if (singleBtn) singleBtn.classList.toggle('active', layout === 'single');
+    if (doubleBtn) doubleBtn.classList.toggle('active', layout === 'double');
+
+    if (sorted.length === 0) {
       container.innerHTML = `
         <div class="timeline-empty">
           <div class="timeline-empty-emoji">📅</div>
           <h3>人生轴还是空的</h3>
-          <p>完成清单中的任务后，它们会自动出现在这里</p>
-          <button class="timeline-empty-btn" onclick="showListsPage()">去完成任务</button>
+          <p>请点击加号添加人生事件</p>
         </div>
       `;
       return;
@@ -25,91 +92,255 @@ const TimelineManager = {
 
     container.innerHTML = '';
 
-    const grouped = this.groupByDate(timeline);
-
-    Object.keys(grouped).forEach((date, index) => {
-      const group = grouped[date];
-      const groupElement = this.createTimelineGroup(date, group, index);
-      container.appendChild(groupElement);
-    });
+    if (layout === 'single') {
+      this._renderSingle(container, sorted);
+    } else {
+      this._renderDouble(container, sorted);
+    }
   },
 
-  groupByDate(timeline) {
-    const grouped = {};
+  _renderSingle(container, sorted) {
+    const wrap = document.createElement('div');
+    wrap.className = 'timeline-single-wrap';
 
-    timeline.forEach(event => {
-      const date = new Date(event.date).toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
-
-      grouped[date].push(event);
+    sorted.forEach((ev, index) => {
+      const row = document.createElement('div');
+      row.className = 'timeline-single-row';
+      row.innerHTML = `
+        <div class="timeline-single-left">
+          <span class="timeline-single-year">${ev.year}</span>
+          <span class="timeline-single-dot"></span>
+          <span class="timeline-single-line"></span>
+        </div>
+        <div class="timeline-single-card" data-id="${ev.id}">
+          <p class="timeline-single-text">${this._escapeHtml(ev.text)}</p>
+        </div>
+      `;
+      const card = row.querySelector('.timeline-single-card');
+      card.addEventListener('click', () => this._showEditModal(ev));
+      wrap.appendChild(row);
+      AnimationManager.animateCardEntrance(row, index * 100);
     });
 
-    return grouped;
+    container.appendChild(wrap);
   },
 
-  createTimelineGroup(date, events, index) {
-    const group = document.createElement('div');
-    group.className = 'timeline-group';
+  _renderDouble(container, sorted) {
+    const wrap = document.createElement('div');
+    wrap.className = 'timeline-double-wrap';
 
-    group.innerHTML = `
-      <div class="timeline-date">
-        <span class="timeline-dot"></span>
-        <span class="timeline-date-text">${date}</span>
-      </div>
-      <div class="timeline-events">
-        ${events.map(event => `
-          <div class="timeline-event">
-            <div class="timeline-event-emoji" style="background: ${event.color}15">${event.emoji}</div>
-            <div class="timeline-event-content">
-              <p class="timeline-event-title">${event.title}</p>
-              ${event.photo ? `<div class="timeline-event-photo"><img src="${event.photo}" alt="完成照片" loading="lazy"></div>` : ''}
-              <p class="timeline-event-time">${new Date(event.date).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</p>
-            </div>
-            <button class="timeline-delete-btn" onclick="TimelineManager.deleteEvent('${event.id}')">✕</button>
+    // 中轴竖线
+    const axis = document.createElement('div');
+    axis.className = 'timeline-double-axis';
+    wrap.appendChild(axis);
+
+    sorted.forEach((ev, index) => {
+      const row = document.createElement('div');
+      row.className = 'timeline-double-row';
+      const isLeft = index % 2 === 0;
+      row.innerHTML = `
+        <div class="timeline-double-side ${isLeft ? 'left' : 'right'}">
+          <div class="timeline-double-card" data-id="${ev.id}">
+            <span class="timeline-double-year">${ev.year}</span>
+            <p class="timeline-double-text">${this._escapeHtml(ev.text)}</p>
           </div>
-        `).join('')}
-      </div>
-    `;
+        </div>
+        <div class="timeline-double-center">
+          <span class="timeline-double-dot"></span>
+        </div>
+        <div class="timeline-double-side ${isLeft ? 'right' : 'left'}"></div>
+      `;
+      const card = row.querySelector('.timeline-double-card');
+      card.addEventListener('click', () => this._showEditModal(ev));
+      wrap.appendChild(row);
+      AnimationManager.animateCardEntrance(row, index * 100);
+    });
 
-    AnimationManager.animateCardEntrance(group, index * 150);
-
-    return group;
+    container.appendChild(wrap);
   },
 
-  deleteEvent(eventId) {
+  _escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  },
+
+  getLayout() {
+    return StorageManager.getTimelineLayout();
+  },
+
+  toggleLayout() {
+    const current = this.getLayout();
+    const next = current === 'single' ? 'double' : 'single';
+    StorageManager.setTimelineLayout(next);
+    this.renderTimelinePage();
+  },
+
+  // ==================== 添加事件 ====================
+  showAddModal() {
+    this._showModal('添加人生事件', '', '', (year, text) => {
+      this.addEvent(year, text);
+    });
+  },
+
+  addEvent(year, text) {
+    if (!TimelineEngine.validateEvent(year, text)) {
+      this.showToast('年份或描述不合法');
+      return false;
+    }
+    const events = StorageManager.getTimeline();
+    const id = 'e_' + (this._nextId++);
+    events.push({ id, year: Number(year), text: text.trim() });
+    StorageManager.setTimeline(events);
+    this.renderTimelinePage();
+    this.showToast('已添加');
+    return true;
+  },
+
+  // ==================== 编辑/删除事件 ====================
+  _showEditModal(ev) {
+    this._showModal('编辑事件', ev.year, ev.text, (year, text) => {
+      this.updateEvent(ev.id, year, text);
+    }, () => {
+      this.deleteEvent(ev.id);
+    });
+  },
+
+  updateEvent(id, year, text) {
+    if (!TimelineEngine.validateEvent(year, text)) {
+      this.showToast('年份或描述不合法');
+      return false;
+    }
+    const events = StorageManager.getTimeline();
+    const idx = events.findIndex(e => e.id === id);
+    if (idx === -1) return false;
+    events[idx] = { id, year: Number(year), text: text.trim() };
+    StorageManager.setTimeline(events);
+    this.renderTimelinePage();
+    this.showToast('已更新');
+    return true;
+  },
+
+  deleteEvent(id) {
+    const events = StorageManager.getTimeline().filter(e => e.id !== id);
+    StorageManager.setTimeline(events);
+    this.renderTimelinePage();
+    this.showToast('已删除');
+  },
+
+  // ==================== 通用弹窗 ====================
+  _showModal(title, yearVal, textVal, onConfirm, onDelete) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal-content">
-        <h3>⚠️ 删除记录</h3>
-        <p class="modal-desc">确定要从人生轴中删除这条记录吗？</p>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" onclick="this.closest('.modal-overlay').remove()">取消</button>
-          <button class="modal-btn modal-btn-danger" id="confirm-delete-timeline">删除</button>
+      <div class="modal-content" style="max-width: 320px;">
+        <h3>${title}</h3>
+        <div class="modal-input-container" style="text-align:left;">
+          <label class="form-label">年份</label>
+          <input type="number" class="form-input" id="tl-modal-year" value="${yearVal}" placeholder="例如 2020">
+          <label class="form-label" style="margin-top:1rem;">描述</label>
+          <textarea class="form-textarea" id="tl-modal-text" rows="3" placeholder="记录这件大事...">${textVal}</textarea>
         </div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="tl-modal-cancel">取消</button>
+          <button class="modal-btn modal-btn-confirm" id="tl-modal-confirm">确定</button>
+        </div>
+        ${onDelete ? `<button class="modal-btn modal-btn-danger" id="tl-modal-delete" style="width:100%;margin-top:0.75rem;">删除</button>` : ''}
       </div>
     `;
 
     document.body.appendChild(overlay);
 
-    document.getElementById('confirm-delete-timeline').addEventListener('click', () => {
-      StorageManager.removeTimelineEvent(eventId);
+    document.getElementById('tl-modal-cancel').addEventListener('click', () => overlay.remove());
+    document.getElementById('tl-modal-confirm').addEventListener('click', () => {
+      const year = document.getElementById('tl-modal-year').value;
+      const text = document.getElementById('tl-modal-text').value;
       overlay.remove();
-      this.renderTimelinePage();
-      updateOverallStats();
-      this.showToast('记录已删除');
+      onConfirm(year, text);
     });
+
+    if (onDelete) {
+      document.getElementById('tl-modal-delete').addEventListener('click', () => {
+        overlay.remove();
+        onDelete();
+      });
+    }
 
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) overlay.remove();
     });
+  },
+
+  // ==================== 分享卡 ====================
+  showShareCard() {
+    const events = StorageManager.getTimeline();
+    const sorted = TimelineEngine.sortByYear(events);
+    const span = TimelineEngine.yearSpan(sorted);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'share-overlay';
+    overlay.innerHTML = `
+      <div class="share-modal">
+        <div class="share-modal-header">
+          <h3>分享我的人生时间轴</h3>
+          <button class="share-close-btn" onclick="this.closest('.share-overlay').remove()">✕</button>
+        </div>
+        <div class="share-preview" id="timeline-share-preview">
+          ${this._generateShareCardHTML(sorted, span)}
+        </div>
+        <div class="share-actions">
+          <button class="share-btn share-btn-image" onclick="TimelineManager._downloadShareImage()">💾 保存图片</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+  },
+
+  _generateShareCardHTML(sorted, span) {
+    const spanText = span ? `${span.min} — ${span.max}` : '—';
+    const items = sorted.map(ev => `
+      <div class="timeline-share-item">
+        <span class="timeline-share-year">${ev.year}</span>
+        <span class="timeline-share-text">${this._escapeHtml(ev.text)}</span>
+      </div>
+    `).join('');
+
+    return `
+      <div class="share-card" id="timeline-share-card" style="background: linear-gradient(160deg, #1c1c1e, #000); color: #fff;">
+        <div class="share-card-header" style="margin-bottom: 1rem;">
+          <h4 style="font-size: 1.125rem; font-weight: 700;">我的人生时间轴</h4>
+        </div>
+        <p style="font-size: 0.875rem; opacity: 0.8; margin-bottom: 1rem;">
+          共 ${sorted.length} 件事 · 年份跨度 ${spanText}
+        </p>
+        <div class="timeline-share-list" style="max-height: 280px; overflow-y: auto; margin-bottom: 1rem;">
+          ${items}
+        </div>
+        <div class="share-card-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.75rem;">
+          <span>人生已完成清单 App</span>
+          <span>记录每一段认真活过的日子</span>
+        </div>
+      </div>
+    `;
+  },
+
+  _downloadShareImage() {
+    const card = document.getElementById('timeline-share-card');
+    if (!card) return;
+    if (!window.html2canvas) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.onload = () => {
+        ShareManager.captureCard(card);
+      };
+      document.head.appendChild(script);
+    } else {
+      ShareManager.captureCard(card);
+    }
   },
 
   showToast(message) {

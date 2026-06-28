@@ -119,9 +119,18 @@ function bindEvents() {
   document.getElementById('stats-back-btn').addEventListener('click', showHomePage);
   document.getElementById('profile-back-btn').addEventListener('click', showHomePage);
   document.getElementById('template-back-btn').addEventListener('click', showHomePage);
-  document.getElementById('timeline-back-btn').addEventListener('click', showHomePage);
 
   document.getElementById('lifeclock-back-btn').addEventListener('click', showHomePage);
+
+  // 人生轴页事件绑定
+  const tlShareBtn = document.getElementById('timeline-share-btn');
+  if (tlShareBtn) tlShareBtn.addEventListener('click', () => TimelineManager.showShareCard());
+  const tlLayoutSingle = document.getElementById('timeline-layout-single');
+  const tlLayoutDouble = document.getElementById('timeline-layout-double');
+  if (tlLayoutSingle) tlLayoutSingle.addEventListener('click', () => TimelineManager.toggleLayout());
+  if (tlLayoutDouble) tlLayoutDouble.addEventListener('click', () => TimelineManager.toggleLayout());
+  const tlAddBtn = document.getElementById('timeline-add-btn');
+  if (tlAddBtn) tlAddBtn.addEventListener('click', () => TimelineManager.showAddModal());
 
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
