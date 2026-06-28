@@ -292,8 +292,8 @@
     <!-- ==================== 详情页视图 ==================== -->
     <div id="detail-view" class="hidden">
 
-      <!-- 返回按钮 -->
-      <div class="pt-6 pb-4">
+      <!-- 返回按钮 + 编辑 -->
+      <div class="pt-6 pb-4 flex items-center justify-between">
         <button
           id="back-btn"
           class="flex items-center gap-2 text-apple-blue font-medium"
@@ -303,42 +303,40 @@
           </svg>
           返回
         </button>
+        <button id="detail-edit-btn" class="text-apple-blue font-medium text-sm px-2">编辑</button>
       </div>
 
-      <!-- 详情页头部 -->
+      <!-- 彩色标题条 -->
       <div class="detail-header" id="detail-header">
-        <div class="detail-emoji" id="detail-emoji"></div>
-        <h2 class="detail-title" id="detail-title"></h2>
-        <p class="detail-description" id="detail-description"></p>
-
-        <!-- 环形进度 -->
-        <div class="detail-progress">
-          <div class="detail-circular-progress">
-            <svg viewBox="0 0 100 100">
-              <circle class="detail-progress-circle-bg" cx="50" cy="50" r="40"/>
-              <circle id="detail-progress-circle" class="detail-progress-circle" cx="50" cy="50" r="40"/>
-            </svg>
-            <div class="detail-progress-center">
-              <span id="detail-progress-percent" class="detail-progress-percent">0</span>
-              <span class="detail-progress-percent-symbol">%</span>
-            </div>
-          </div>
-          <p class="detail-progress-text" id="detail-progress-text">已完成 0 / 0 项</p>
+        <div class="detail-header-inner">
+          <span class="detail-emoji" id="detail-emoji"></span>
+          <span class="detail-title" id="detail-title"></span>
+          <span class="detail-percent" id="detail-percent">0%</span>
         </div>
-
-        <!-- 操作按钮 -->
-        <div class="detail-actions" id="detail-actions"></div>
       </div>
 
-      <!-- 任务列表 -->
+      <!-- 标签网格 -->
       <section>
-        <h3 class="text-lg font-semibold text-apple-dark dark:text-white mb-4">
-          待办事项
-        </h3>
-        <div id="task-list">
-          <!-- 任务将通过 JavaScript 动态生成 -->
+        <div id="task-tags-container" class="task-tags-container">
+          <!-- 标签将通过 JavaScript 动态生成 -->
         </div>
       </section>
+
+      <!-- 底部操作栏 -->
+      <div class="detail-bottom-actions" id="detail-bottom-actions">
+        <button class="detail-bottom-btn" id="detail-theme-btn">
+          <span class="detail-bottom-btn-icon">🎨</span>
+          <span class="detail-bottom-btn-label">主题配色</span>
+        </button>
+        <button class="detail-bottom-btn" id="detail-share-btn">
+          <span class="detail-bottom-btn-icon">🖼️</span>
+          <span class="detail-bottom-btn-label">生成图片</span>
+        </button>
+        <button class="detail-bottom-btn detail-bottom-btn-danger" id="detail-delete-btn">
+          <span class="detail-bottom-btn-icon">🗑️</span>
+          <span class="detail-bottom-btn-label">移除清单</span>
+        </button>
+      </div>
 
     </div>
 

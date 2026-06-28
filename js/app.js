@@ -605,6 +605,9 @@ function showListDetail(listId) {
   showView('detail', listId);
 }
 
+// 详情页编辑态
+let detailEditMode = false;
+
 /**
  * 渲染清单详情
  */
@@ -619,38 +622,307 @@ function renderListDetail(listId) {
 
   document.getElementById('detail-emoji').textContent = list.emoji;
   document.getElementById('detail-title').textContent = list.title;
-  document.getElementById('detail-description').textContent = list.description;
+  document.getElementById('detail-percent').textContent = Math.round(progress.percentage) + '%';
 
-  const actionsContainer = document.getElementById('detail-actions');
-  if (actionsContainer) {
-    actionsContainer.innerHTML = `
-      <button class="detail-action-btn" onclick="CustomManager.editListName('${listId}')">✏️ 编辑</button>
-      <button class="detail-action-btn" onclick="CustomManager.deleteList('${listId}')">🗑️ 删除</button>
-    `;
+  // 编辑按钮
+  const editBtn = document.getElementById('detail-edit-btn');
+  if (editBtn) {
+    editBtn.textContent = detailEditMode ? '完成' : '编辑';
+    editBtn.onclick = () => {
+      detailEditMode = !detailEditMode;
+      renderListDetail(listId);
+    };
   }
 
-  const detailCircle = document.getElementById('detail-progress-circle');
-  if (detailCircle) {
-    detailCircle.style.transition = 'none';
-    detailCircle.style.strokeDashoffset = 251.2;
-
-    setTimeout(() => {
-      AnimationManager.animateCircularProgress(detailCircle, progress.percentage);
-    }, 100);
-  }
-
-  document.getElementById('detail-progress-percent').textContent = Math.round(progress.percentage);
-  document.getElementById('detail-progress-text').textContent =
-    `已完成 ${progress.completed} / ${progress.total} 项`;
-
-  renderTaskList(list);
+  renderTaskTags(list);
+  bindDetailBottomActions(listId);
 }
 
 /**
- * 渲染任务列表
+ * 渲染标签网格
+ */
+function renderTaskTags(list) {
+  const container = document.getElementById('task-tags-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (detailEditMode) {
+    container.classList.add('task-tags-editing');
+  } else {
+    container.classList.remove('task-tags-editing');
+  }
+
+  list.tasks.forEach((task, index) => {
+    const tag = createTaskTag(list.id, task, list.color);
+    container.appendChild(tag);
+  });
+
+  // 编辑态末尾添加「+添加」标签
+  if (detailEditMode) {
+    const addTag = document.createElement('button');
+    addTag.className = 'task-tag-add';
+    addTag.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      添加
+    `;
+    addTag.addEventListener('click', () => {
+      CustomManager.showAddTaskModal(list.id);
+    });
+    container.appendChild(addTag);
+  }
+}
+
+/**
+ * 创建单个任务标签
+ */
+function createTaskTag(listId, task, color) {
+  const tag = document.createElement('div');
+  tag.className = `task-tag ${task.completed ? 'completed' : ''}`;
+  tag.dataset.taskId = task.id;
+  tag.dataset.listId = listId;
+  if (task.completed) {
+    tag.style.background = color;
+  }
+
+  tag.textContent = task.text;
+
+  // 编辑态删除角标
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'task-tag-delete';
+  deleteBtn.textContent = '×';
+  deleteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    TaskDetailManager.deleteTask(listId, task.id);
+  });
+  tag.appendChild(deleteBtn);
+
+  // 轻点/长按判定
+  bindTagTapLongPress(tag, listId, task.id, task.completed);
+
+  return tag;
+}
+
+/**
+ * 标签轻点/长按判定（原生手写，支持触摸+鼠标）
+ */
+function bindTagTapLongPress(tag, listId, taskId, currentCompleted) {
+  const LONG_PRESS_MS = 500;
+  const MOVE_THRESHOLD = 10;
+
+  let timer = null;
+  let longPressFired = false;
+  let startX = 0;
+  let startY = 0;
+
+  function onStart(x, y) {
+    startX = x;
+    startY = y;
+    longPressFired = false;
+    timer = setTimeout(() => {
+      longPressFired = true;
+      // 长按触发任务详情
+      TaskDetailManager.showTaskDetail(listId, taskId);
+      // 防止触发系统菜单
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, LONG_PRESS_MS);
+  }
+
+  function onMove(x, y) {
+    if (!timer) return;
+    const dx = Math.abs(x - startX);
+    const dy = Math.abs(y - startY);
+    if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  }
+
+  function onEnd() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    // 若长按未触发，视为轻点打卡
+    if (!longPressFired) {
+      const newCompleted = !currentCompleted;
+      applyTaskToggleEffects(listId, taskId, newCompleted, tag);
+    }
+  }
+
+  // 触摸事件
+  tag.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0];
+    onStart(touch.clientX, touch.clientY);
+  }, { passive: true });
+
+  tag.addEventListener('touchmove', (e) => {
+    const touch = e.touches[0];
+    onMove(touch.clientX, touch.clientY);
+  }, { passive: true });
+
+  tag.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    onEnd();
+  });
+
+  tag.addEventListener('touchcancel', () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  });
+
+  // 鼠标事件
+  tag.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    onStart(e.clientX, e.clientY);
+  });
+
+  tag.addEventListener('mousemove', (e) => {
+    onMove(e.clientX, e.clientY);
+  });
+
+  tag.addEventListener('mouseup', (e) => {
+    if (e.button !== 0) return;
+    onEnd();
+  });
+
+  tag.addEventListener('mouseleave', () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  });
+
+  // 阻止右键菜单（长按保护）
+  tag.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
+}
+
+/**
+ * 应用任务打卡副作用（复用现有逻辑，锚点改为标签元素）
+ */
+function applyTaskToggleEffects(listId, taskId, completed, anchorEl) {
+  AppState.lists = StorageManager.updateTaskStatus(listId, taskId, completed);
+
+  if (completed) {
+    SoundManager.playComplete();
+  } else {
+    SoundManager.playUncheck();
+  }
+
+  if (completed) {
+    AnimationManager.createCheckAnimation(anchorEl);
+    setTimeout(() => {
+      AnimationManager.createConfetti(anchorEl);
+    }, 200);
+  }
+
+  // 就地更新标签样式
+  const tag = document.querySelector(`.task-tag[data-task-id="${taskId}"]`);
+  if (tag) {
+    tag.classList.toggle('completed', completed);
+    const list = AppState.lists.find(l => l.id === listId);
+    if (list) {
+      tag.style.background = completed ? list.color : '';
+    }
+  }
+
+  // 更新标题条百分比
+  const list = AppState.lists.find(l => l.id === listId);
+  if (list) {
+    const progress = StorageManager.calculateListProgress(list);
+    const percentEl = document.getElementById('detail-percent');
+    if (percentEl) {
+      percentEl.textContent = Math.round(progress.percentage) + '%';
+    }
+  }
+
+  // 首页联动
+  renderListCards();
+  updateOverallStats();
+  updateListsOverview();
+  checkAndShowAchievements();
+}
+
+/**
+ * 绑定详情页底部操作栏
+ */
+function bindDetailBottomActions(listId) {
+  const themeBtn = document.getElementById('detail-theme-btn');
+  const shareBtn = document.getElementById('detail-share-btn');
+  const deleteBtn = document.getElementById('detail-delete-btn');
+
+  if (themeBtn) {
+    themeBtn.onclick = () => showDetailColorPicker(listId);
+  }
+  if (shareBtn) {
+    shareBtn.onclick = () => {
+      const card = document.getElementById('detail-header');
+      if (card) ShareManager.captureCard(card);
+    };
+  }
+  if (deleteBtn) {
+    deleteBtn.onclick = () => CustomManager.deleteList(listId);
+  }
+}
+
+/**
+ * 详情页主题配色选择器
+ */
+function showDetailColorPicker(listId) {
+  const colors = ['#007AFF', '#FF9500', '#FF2D55', '#34C759', '#5856D6', '#AF52DE', '#FF3B30', '#5AC8FA'];
+  const lists = StorageManager.getLists() || [];
+  const list = lists.find(l => l.id === listId);
+  if (!list) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-content" style="max-width: 320px;">
+      <h3>🎨 主题配色</h3>
+      <p class="modal-desc">选择清单主题颜色</p>
+      <div class="color-picker" id="detail-color-picker">
+        ${colors.map(c => `
+          <span class="color-option ${list.color === c ? 'selected' : ''}" data-color="${c}" style="background: ${c}"></span>
+        `).join('')}
+      </div>
+      <button class="modal-btn modal-btn-confirm" style="width: 100%; margin-top: 1rem;" onclick="this.closest('.modal-overlay').remove()">完成</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  overlay.querySelectorAll('.color-option').forEach(option => {
+    option.addEventListener('click', () => {
+      const newColor = option.dataset.color;
+      list.color = newColor;
+      StorageManager.setLists(lists);
+      AppState.lists = lists;
+
+      // 重渲染详情页
+      renderListDetail(listId);
+      // 首页联动
+      renderListCards();
+
+      overlay.remove();
+    });
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
+/**
+ * 渲染任务列表（旧版，保留兼容）
  */
 function renderTaskList(list) {
   const container = document.getElementById('task-list');
+  if (!container) return;
   container.innerHTML = '';
 
   list.tasks.forEach((task, index) => {
@@ -674,7 +946,7 @@ function renderTaskList(list) {
 }
 
 /**
- * 创建任务项
+ * 创建任务项（旧版 checkbox，保留兼容）
  */
 function createTaskItem(listId, task, color) {
   const item = document.createElement('div');
@@ -715,64 +987,11 @@ function createTaskItem(listId, task, color) {
 }
 
 /**
- * 处理任务状态切换
+ * 处理任务状态切换（兼容旧 checkbox 调用）
  */
 function handleTaskToggle(listId, taskId, completed, checkbox) {
-  AppState.lists = StorageManager.updateTaskStatus(listId, taskId, completed);
-
-  if (completed) {
-    SoundManager.playComplete();
-  } else {
-    SoundManager.playUncheck();
-  }
-
-  if (completed) {
-    AnimationManager.createCheckAnimation(checkbox);
-    setTimeout(() => {
-      AnimationManager.createConfetti(checkbox);
-    }, 200);
-  }
-
-  const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
-  if (taskItem) {
-    taskItem.classList.toggle('completed', completed);
-
-    const customCheckbox = taskItem.querySelector('.checkbox-custom');
-    const list = AppState.lists.find(l => l.id === listId);
-    if (customCheckbox && list) {
-      if (completed) {
-        customCheckbox.style.background = list.color;
-        customCheckbox.style.borderColor = list.color;
-      } else {
-        customCheckbox.style.background = 'transparent';
-        customCheckbox.style.borderColor = list.color;
-      }
-    }
-  }
-
-  const list = AppState.lists.find(l => l.id === listId);
-  if (list) {
-    const progress = StorageManager.calculateListProgress(list);
-
-    const detailCircle = document.getElementById('detail-progress-circle');
-    if (detailCircle) {
-      AnimationManager.animateCircularProgress(detailCircle, progress.percentage, 800);
-    }
-
-    const percentElement = document.getElementById('detail-progress-percent');
-    if (percentElement) {
-      const currentValue = parseInt(percentElement.textContent) || 0;
-      AnimationManager.animateNumber(percentElement, currentValue, Math.round(progress.percentage), 600);
-    }
-
-    document.getElementById('detail-progress-text').textContent =
-      `已完成 ${progress.completed} / ${progress.total} 项`;
-  }
-
-  renderListCards();
-  updateOverallStats();
-  updateListsOverview();
-  checkAndShowAchievements();
+  const anchorEl = checkbox || document.querySelector(`.task-tag[data-task-id="${taskId}"]`);
+  applyTaskToggleEffects(listId, taskId, completed, anchorEl);
 }
 
 /**
