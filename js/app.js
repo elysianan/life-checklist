@@ -9,10 +9,85 @@ const AppState = {
   birthDate: null
 };
 
+// 视图注册表：name -> { el, nav, onShow }
+const VIEWS = {
+  home:         { nav: 'home',         onShow: renderHomePage },
+  templates:    { nav: 'templates',    onShow: () => TemplateManager.renderTemplateLibrary() },
+  timeline:     { nav: 'timeline',     onShow: () => TimelineManager.renderTimelinePage() },
+  lifeprogress: { nav: 'lifeprogress', onShow: () => { /* 阶段1占位，阶段3实现 */ } },
+  profile:      { nav: 'profile',      onShow: () => ProfileManager.renderProfilePage() },
+  detail:       { nav: 'home',        onShow: (id) => renderListDetail(id) },
+  lifeclock:    { nav: null,          onShow: () => LifeClockUI.show() },
+  achievements: { nav: 'achievements', onShow: () => {
+    const container = document.getElementById('achievement-wall');
+    AchievementManager.renderAchievementWall(container);
+    const stats = AchievementManager.getStats();
+    document.getElementById('achievement-count').textContent = `${stats.unlocked}/${stats.total}`;
+    const achievementCircle = document.getElementById('achievement-progress-circle');
+    if (achievementCircle) AnimationManager.animateCircularProgress(achievementCircle, stats.percentage);
+  }},
+  statistics:   { nav: 'statistics',   onShow: () => StatisticsManager.renderStatisticsPage() },
+  report:       { nav: 'report',       onShow: () => {} }
+};
+
+// 视图 DOM 元素缓存
+const VIEW_ELEMENTS = {};
+
+function initViewElements() {
+  Object.keys(VIEWS).forEach(name => {
+    const el = document.getElementById(name + '-view');
+    if (el) VIEW_ELEMENTS[name] = el;
+  });
+  // 兼容旧 id：lists-view 映射到 home（因为 lists-view 已并入首页）
+  const listsView = document.getElementById('lists-view');
+  if (listsView) VIEW_ELEMENTS['lists'] = listsView;
+}
+
+/**
+ * 统一视图切换
+ */
+function showView(name, arg) {
+  // 隐藏所有视图
+  Object.values(VIEW_ELEMENTS).forEach(el => {
+    if (el && el.classList) el.classList.add('hidden');
+  });
+
+  // 显示目标视图
+  const targetEl = VIEW_ELEMENTS[name];
+  if (targetEl && targetEl.classList) targetEl.classList.remove('hidden');
+
+  // 离开余生页统一停 tick
+  if (name !== 'lifeclock') LifeClockUI.stopTick();
+
+  AppState.currentView = name;
+
+  const v = VIEWS[name];
+  if (v) {
+    if (v.nav) updateNavigation(v.nav);
+    if (v.onShow) v.onShow(arg);
+  }
+
+  window.scrollTo(0, 0);
+}
+
+// 保留旧函数名作为薄封装，减少调用点改动
+function showHomePage()         { showView('home'); }
+function showListsPage()        { showView('home'); } // lists-view 已并入首页
+function showTemplatesPage()    { showView('templates'); }
+function showTimelinePage()     { showView('timeline'); }
+function showProfilePage()      { showView('profile'); }
+function showLifeClockPage()    { showView('lifeclock'); }
+function showAchievementsPage() { showView('achievements'); }
+function showStatisticsPage()   { showView('statistics'); }
+function showReportPage()       { showView('report'); }
+function showListDetail(listId) { showView('detail', listId); }
+
 /**
  * 初始化应用
  */
 function initApp() {
+  initViewElements();
+
   SettingsManager.init();
   SoundManager.init();
   StorageManager.initializeData();
@@ -38,7 +113,7 @@ function initApp() {
  * 绑定全局事件
  */
 function bindEvents() {
-  document.getElementById('back-btn').addEventListener('click', showListsPage);
+  document.getElementById('back-btn').addEventListener('click', showHomePage);
   document.getElementById('ach-back-btn').addEventListener('click', showHomePage);
   document.getElementById('stats-back-btn').addEventListener('click', showHomePage);
   document.getElementById('profile-back-btn').addEventListener('click', showHomePage);
@@ -58,6 +133,7 @@ function bindEvents() {
         case 'statistics': showStatisticsPage(); break;
         case 'profile': showProfilePage(); break;
         case 'lifeclock': showLifeClockPage(); break;
+        case 'lifeprogress': showView('lifeprogress'); break;
       }
     });
   });
@@ -77,6 +153,21 @@ function bindEvents() {
   document.getElementById('add-list-btn').addEventListener('click', () => {
     CustomManager.showAddListModal();
   });
+
+  // 首页顶栏⏰按钮
+  const lifeClockBtn = document.getElementById('home-lifeclock-btn');
+  if (lifeClockBtn) {
+    lifeClockBtn.addEventListener('click', showLifeClockPage);
+  }
+
+  // 首页自定义按钮
+  const customBtn = document.getElementById('home-custom-btn');
+  if (customBtn) {
+    customBtn.addEventListener('click', () => HomeEditManager.toggle());
+  }
+
+  // 初始化长按拖动排序
+  DragSortManager.init();
 }
 
 /**
@@ -101,16 +192,17 @@ function updateOverallStats() {
  * 渲染首页
  */
 function renderHomePage() {
-  // 渲染余生入口卡片
+  // 更新余生入口年龄显示（顶栏⏰按钮旁可复用）
   const ageEl = document.getElementById('home-life-age');
   if (ageEl) {
     const birth = LifeClockUI.getEffectiveBirthDate();
     ageEl.textContent = LifeClockEngine.calcAge(birth, Date.now()).toFixed(2);
   }
-  const entry = document.getElementById('home-life-entry');
-  if (entry) entry.onclick = showLifeClockPage;
 
   updateDailyQuote();
+  renderListCards();
+  updateListsOverview();
+  updateOverallStats();
   updateNavigation('home');
 }
 
@@ -162,66 +254,21 @@ function updateDailyQuote() {
  * 显示余生闹钟页面
  */
 function showLifeClockPage() {
-  AppState.currentView = 'lifeclock';
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.remove('hidden');
-
-  LifeClockUI.show();
-  updateNavigation('lifeclock');
+  showView('lifeclock');
 }
 
 /**
  * 显示首页
  */
 function showHomePage() {
-  AppState.currentView = 'home';
-  AppState.currentListId = null;
-
-  document.getElementById('home-view').classList.remove('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  LifeClockUI.stopTick();
-  renderHomePage();
+  showView('home');
 }
 
 /**
  * 显示清单页
  */
 function showListsPage() {
-  AppState.currentView = 'lists';
-  AppState.currentListId = null;
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.remove('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  LifeClockUI.stopTick();
-  renderListsPage();
-  updateNavigation('lists');
+  showView('home');
 }
 
 /**
@@ -244,10 +291,14 @@ function updateListsOverview() {
   }).length;
   const totalTasks = lists.reduce((sum, l) => sum + l.tasks.length, 0);
 
-  document.getElementById('lists-total').textContent = totalLists;
-  document.getElementById('lists-completed').textContent = completedLists;
-  document.getElementById('lists-tasks').textContent = totalTasks;
-  document.getElementById('lists-count').textContent = `共 ${totalLists} 个清单`;
+  const elTotal = document.getElementById('lists-total');
+  const elCompleted = document.getElementById('lists-completed');
+  const elTasks = document.getElementById('lists-tasks');
+  const elCount = document.getElementById('lists-count');
+  if (elTotal) elTotal.textContent = totalLists;
+  if (elCompleted) elCompleted.textContent = completedLists;
+  if (elTasks) elTasks.textContent = totalTasks;
+  if (elCount) elCount.textContent = `共 ${totalLists} 个清单`;
 }
 
 /**
@@ -255,11 +306,24 @@ function updateListsOverview() {
  */
 function renderListCards() {
   const container = document.getElementById('list-cards-container');
+  if (!container) return;
   container.innerHTML = '';
 
-  const sortedLists = SettingsManager.sortLists([...AppState.lists]);
+  // 按用户自定义顺序排序（无记录则按原序）
+  const order = StorageManager.getListOrder();
+  const orderedLists = [...AppState.lists];
+  if (order.length > 0) {
+    orderedLists.sort((a, b) => {
+      const ia = order.indexOf(a.id);
+      const ib = order.indexOf(b.id);
+      if (ia === -1 && ib === -1) return 0;
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+  }
 
-  if (sortedLists.length === 0) {
+  if (orderedLists.length === 0) {
     const recs = RecommendationEngine.getEmptyStateRecommendations();
     const recNames = recs.map(r => `「${r.title}」`).join('、');
     container.innerHTML = `
@@ -271,7 +335,7 @@ function renderListCards() {
     return;
   }
 
-  sortedLists.forEach((list, index) => {
+  orderedLists.forEach((list, index) => {
     const progress = StorageManager.calculateListProgress(list);
     const card = createListCard(list, progress);
     container.appendChild(card);
@@ -280,60 +344,265 @@ function renderListCards() {
 }
 
 /**
- * 创建清单卡片
+ * 创建清单卡片（色条卡片样式）
  */
 function createListCard(list, progress) {
   const card = document.createElement('div');
-  card.className = 'list-card';
+  card.className = 'home-list-card';
   card.dataset.listId = list.id;
-  card.style.borderLeftColor = list.color || '#007AFF';
+
+  // 任务预览文本：取前若干个 task.text，空格分隔
+  const previewTasks = list.tasks.slice(0, 8);
+  const previewText = previewTasks.map(t => t.text).join(' ');
 
   card.innerHTML = `
-    <div class="card-emoji" style="background: ${list.color}15">
-      ${list.emoji}
+    <div class="home-list-card-header" style="background: ${list.color || '#007AFF'}">
+      <span class="home-list-card-title">${list.title}</span>
+      <span class="home-list-card-percent">${Math.round(progress.percentage)}%</span>
     </div>
-    <div class="card-content">
-      <h3 class="card-title">${list.title}</h3>
-      <p class="card-description">${list.description}</p>
-      <div class="card-progress">
-        <div class="progress-bar-container">
-          <div class="progress-bar" style="width: ${progress.percentage}%; background: ${list.color}"></div>
-        </div>
-        <span class="progress-text">${progress.completed}/${progress.total}</span>
-      </div>
+    <div class="home-list-card-body">
+      <p class="home-list-card-preview">${previewText || '暂无任务'}</p>
     </div>
-    <div class="card-arrow">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M9 18l6-6-6-6"/>
-      </svg>
-    </div>
+    <button class="home-list-card-delete" data-list-id="${list.id}">×</button>
   `;
 
-  card.addEventListener('click', () => showListDetail(list.id));
+  // 点击卡片进入详情
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.home-list-card-delete')) return;
+    if (AppState.isEditing) return;
+    showListDetail(list.id);
+  });
+
+  // 删除角标点击
+  const deleteBtn = card.querySelector('.home-list-card-delete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      CustomManager.deleteList(list.id);
+    });
+  }
 
   return card;
 }
 
 /**
+ * 长按拖动排序管理器
+ */
+const DragSortManager = {
+  LONG_PRESS_MS: 500,
+  MOVE_THRESHOLD: 10,
+
+  init() {
+    this.container = document.getElementById('list-cards-container');
+    if (!this.container) return;
+
+    this.container.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
+    this.container.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
+    this.container.addEventListener('touchend', this._onTouchEnd.bind(this));
+    this.container.addEventListener('touchcancel', this._onTouchEnd.bind(this));
+
+    this.container.addEventListener('mousedown', this._onMouseDown.bind(this));
+    document.addEventListener('mousemove', this._onMouseMove.bind(this));
+    document.addEventListener('mouseup', this._onMouseUp.bind(this));
+  },
+
+  _reset() {
+    this._dragging = false;
+    this._longPressTimer = null;
+    this._dragCard = null;
+    this._dragGhost = null;
+    this._startX = 0;
+    this._startY = 0;
+    this._currentY = 0;
+    this._startIndex = -1;
+    this._placeholder = null;
+  },
+
+  _onTouchStart(e) {
+    if (AppState.isEditing) return;
+    const card = e.target.closest('.home-list-card');
+    if (!card) return;
+    const touch = e.touches[0];
+    this._startDrag(card, touch.clientX, touch.clientY);
+  },
+
+  _onMouseDown(e) {
+    if (AppState.isEditing) return;
+    const card = e.target.closest('.home-list-card');
+    if (!card) return;
+    this._startDrag(card, e.clientX, e.clientY);
+  },
+
+  _startDrag(card, clientX, clientY) {
+    this._reset();
+    this._startX = clientX;
+    this._startY = clientY;
+    this._dragCard = card;
+    this._startIndex = Array.from(this.container.children).indexOf(card);
+
+    this._longPressTimer = setTimeout(() => {
+      this._enterDragState();
+    }, this.LONG_PRESS_MS);
+  },
+
+  _enterDragState() {
+    if (!this._dragCard) return;
+    this._dragging = true;
+
+    // 创建占位元素
+    this._placeholder = document.createElement('div');
+    this._placeholder.className = 'home-list-card-placeholder';
+    this._placeholder.style.height = this._dragCard.offsetHeight + 'px';
+    this._dragCard.parentNode.insertBefore(this._placeholder, this._dragCard.nextSibling);
+
+    // 创建幽灵元素
+    this._dragGhost = this._dragCard.cloneNode(true);
+    this._dragGhost.classList.add('home-list-card-ghost');
+    this._dragGhost.style.width = this._dragCard.offsetWidth + 'px';
+    this._dragGhost.style.height = this._dragCard.offsetHeight + 'px';
+    document.body.appendChild(this._dragGhost);
+
+    this._dragCard.classList.add('home-list-card-dragging');
+
+    const rect = this._dragCard.getBoundingClientRect();
+    this._ghostOffsetY = this._startY - rect.top;
+    this._updateGhostPosition(this._startY);
+  },
+
+  _updateGhostPosition(y) {
+    if (!this._dragGhost) return;
+    const rect = this.container.getBoundingClientRect();
+    this._dragGhost.style.top = (y - this._ghostOffsetY) + 'px';
+    this._dragGhost.style.left = rect.left + 'px';
+  },
+
+  _onTouchMove(e) {
+    const touch = e.touches[0];
+    this._onMove(touch.clientX, touch.clientY);
+    if (this._dragging) e.preventDefault();
+  },
+
+  _onMouseMove(e) {
+    this._onMove(e.clientX, e.clientY);
+  },
+
+  _onMove(clientX, clientY) {
+    // 若移动超阈值，取消长按计时
+    if (!this._dragging && this._longPressTimer) {
+      const dx = Math.abs(clientX - this._startX);
+      const dy = Math.abs(clientY - this._startY);
+      if (dx > this.MOVE_THRESHOLD || dy > this.MOVE_THRESHOLD) {
+        clearTimeout(this._longPressTimer);
+        this._longPressTimer = null;
+        this._reset();
+      }
+      return;
+    }
+
+    if (!this._dragging || !this._dragGhost) return;
+
+    this._currentY = clientY;
+    this._updateGhostPosition(clientY);
+
+    // 实时换位
+    const placeholder = this._placeholder;
+    if (!placeholder) return;
+
+    const children = Array.from(this.container.children).filter(c => c !== this._dragCard && c !== placeholder && !c.classList.contains('home-list-card-ghost'));
+    let closest = null;
+    let closestOffset = Number.NEGATIVE_INFINITY;
+
+    children.forEach(child => {
+      const box = child.getBoundingClientRect();
+      const offset = clientY - box.top - box.height / 2;
+      if (offset < 0 && offset > closestOffset) {
+        closestOffset = offset;
+        closest = child;
+      }
+    });
+
+    if (closest) {
+      this.container.insertBefore(placeholder, closest);
+    } else {
+      this.container.appendChild(placeholder);
+    }
+  },
+
+  _onTouchEnd(e) {
+    this._onEnd();
+  },
+
+  _onMouseUp(e) {
+    this._onEnd();
+  },
+
+  _onEnd() {
+    if (this._longPressTimer) {
+      clearTimeout(this._longPressTimer);
+      this._longPressTimer = null;
+    }
+
+    if (!this._dragging) {
+      this._reset();
+      return;
+    }
+
+    // 落位：把原卡片移到 placeholder 位置
+    if (this._placeholder && this._dragCard) {
+      this.container.insertBefore(this._dragCard, this._placeholder);
+      this._placeholder.remove();
+    }
+
+    // 清理
+    if (this._dragGhost) {
+      this._dragGhost.remove();
+    }
+    if (this._dragCard) {
+      this._dragCard.classList.remove('home-list-card-dragging');
+    }
+
+    // 持久化新顺序
+    const newOrder = Array.from(this.container.children)
+      .filter(c => c.classList.contains('home-list-card'))
+      .map(c => c.dataset.listId);
+    StorageManager.setListOrder(newOrder);
+
+    this._reset();
+  }
+};
+
+/**
+ * 自定义编辑模式管理器
+ */
+const HomeEditManager = {
+  toggle() {
+    AppState.isEditing = !AppState.isEditing;
+    const btn = document.getElementById('home-custom-btn');
+    const addBtn = document.getElementById('add-list-btn');
+    const container = document.getElementById('list-cards-container');
+
+    if (AppState.isEditing) {
+      if (btn) btn.textContent = '完成';
+      if (addBtn) addBtn.classList.remove('hidden');
+      if (container) container.classList.add('home-list-editing');
+      // 启用拖动
+      DragSortManager._reset();
+    } else {
+      if (btn) btn.textContent = '自定义';
+      if (addBtn) addBtn.classList.add('hidden');
+      if (container) container.classList.remove('home-list-editing');
+    }
+
+    // 重新渲染以更新角标/样式
+    renderListCards();
+  }
+};
+
+/**
  * 显示清单详情页
  */
 function showListDetail(listId) {
-  AppState.currentView = 'detail';
-  AppState.currentListId = listId;
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  document.getElementById('detail-view').classList.remove('hidden');
-  LifeClockUI.stopTick();
-  renderListDetail(listId);
+  showView('detail', listId);
 }
 
 /**
@@ -574,120 +843,35 @@ function showSortMenu() {
  * 显示清单大全页
  */
 function showTemplatesPage() {
-  AppState.currentView = 'templates';
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.remove('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  LifeClockUI.stopTick();
-  TemplateManager.renderTemplateLibrary();
-  updateNavigation('templates');
+  showView('templates');
 }
 
 /**
  * 显示人生轴页
  */
 function showTimelinePage() {
-  AppState.currentView = 'timeline';
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.remove('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  LifeClockUI.stopTick();
-  TimelineManager.renderTimelinePage();
-  updateNavigation('timeline');
+  showView('timeline');
 }
 
 /**
  * 显示成就页面
  */
 function showAchievementsPage() {
-  AppState.currentView = 'achievements';
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  document.getElementById('achievements-view').classList.remove('hidden');
-  LifeClockUI.stopTick();
-  updateNavigation('achievements');
-
-  const container = document.getElementById('achievement-wall');
-  AchievementManager.renderAchievementWall(container);
-
-  const stats = AchievementManager.getStats();
-  document.getElementById('achievement-count').textContent = `${stats.unlocked}/${stats.total}`;
-
-  const achievementCircle = document.getElementById('achievement-progress-circle');
-  if (achievementCircle) {
-    AnimationManager.animateCircularProgress(achievementCircle, stats.percentage);
-  }
+  showView('achievements');
 }
 
 /**
  * 显示统计页面
  */
 function showStatisticsPage() {
-  AppState.currentView = 'statistics';
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  document.getElementById('statistics-view').classList.remove('hidden');
-  LifeClockUI.stopTick();
-  updateNavigation('statistics');
-  StatisticsManager.renderStatisticsPage();
+  showView('statistics');
 }
 
 /**
  * 显示个人中心页面
  */
 function showProfilePage() {
-  AppState.currentView = 'profile';
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('report-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  document.getElementById('profile-view').classList.remove('hidden');
-  LifeClockUI.stopTick();
-  updateNavigation('profile');
-  ProfileManager.renderProfilePage();
+  showView('profile');
 }
 
 /**
@@ -708,20 +892,7 @@ function updateNavigation(activeView) {
  * 显示 AI 人生报告页
  */
 function showReportPage() {
-  AppState.currentView = 'report';
-
-  document.getElementById('home-view').classList.add('hidden');
-  document.getElementById('lists-view').classList.add('hidden');
-  document.getElementById('templates-view').classList.add('hidden');
-  document.getElementById('timeline-view').classList.add('hidden');
-  document.getElementById('detail-view').classList.add('hidden');
-  document.getElementById('achievements-view').classList.add('hidden');
-  document.getElementById('statistics-view').classList.add('hidden');
-  document.getElementById('profile-view').classList.add('hidden');
-  document.getElementById('lifeclock-view').classList.add('hidden');
-
-  LifeClockUI.stopTick();
-  document.getElementById('report-view').classList.remove('hidden');
+  showView('report');
 }
 
 // 页面加载完成后初始化

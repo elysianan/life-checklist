@@ -11,3 +11,8 @@ desktop.ini
 # 日志与临时文件
 *.log
 *.tmp
+
+# 临时审查文件与本地开发截图
+review-diff.txt
+/screenshot-*.png
+test-screenshots/

@@ -15,7 +15,10 @@ const StorageManager = {
     LAST_VISIT: 'life_checklist_last_visit',
     RECOMMENDATIONS_CACHE: 'life_checklist_recommendations_cache',
     LIFE_EXPECTANCY: 'life_checklist_life_expectancy',
-    RETIRE_AGE: 'life_checklist_retire_age'
+    LIST_ORDER: 'life_checklist_list_order',
+    PERSONS: 'life_checklist_persons',
+    TIMELINE_LAYOUT: 'life_checklist_timeline_layout',
+    TIMELINE_MIGRATED: 'life_checklist_timeline_migrated'
   },
 
   getBirthDate() {
@@ -352,6 +355,54 @@ const StorageManager = {
     });
 
     return newAchievements;
+  },
+
+  getListOrder() {
+    const data = localStorage.getItem(this.KEYS.LIST_ORDER);
+    if (data) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  },
+
+  setListOrder(order) {
+    localStorage.setItem(this.KEYS.LIST_ORDER, JSON.stringify(order || []));
+  },
+
+  getPersons() {
+    const data = localStorage.getItem(this.KEYS.PERSONS);
+    if (data) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  },
+
+  setPersons(persons) {
+    localStorage.setItem(this.KEYS.PERSONS, JSON.stringify(persons || []));
+  },
+
+  getTimelineLayout() {
+    return localStorage.getItem(this.KEYS.TIMELINE_LAYOUT) || 'single';
+  },
+
+  setTimelineLayout(layout) {
+    localStorage.setItem(this.KEYS.TIMELINE_LAYOUT, layout);
+  },
+
+  isTimelineMigrated() {
+    return localStorage.getItem(this.KEYS.TIMELINE_MIGRATED) === 'true';
+  },
+
+  setTimelineMigrated() {
+    localStorage.setItem(this.KEYS.TIMELINE_MIGRATED, 'true');
   },
 
   initializeData() {

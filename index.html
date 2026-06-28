@@ -39,38 +39,23 @@
   <!-- 主容器 - 移动端适配 -->
   <div class="max-w-md mx-auto px-4 pb-24 min-h-screen">
 
-    <!-- ==================== 首页视图 - 人生进度 ==================== -->
+    <!-- ==================== 首页视图 - 我的人生清单 ==================== -->
     <div id="home-view">
 
-      <!-- 头部标题 -->
+      <!-- 顶栏 -->
       <header class="pt-6 pb-4">
         <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
-              人生进度
-            </h1>
-            <p class="text-apple-gray text-sm">
-              珍惜当下，活出精彩 ✨
-            </p>
-          </div>
-          <button id="share-btn" class="w-10 h-10 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-apple-blue">
-              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
-            </svg>
+          <button id="home-lifeclock-btn" class="w-10 h-10 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm text-xl">
+            ⏰
+          </button>
+          <h1 class="text-xl font-bold text-apple-dark dark:text-white">
+            我的人生清单
+          </h1>
+          <button id="home-custom-btn" class="text-apple-blue font-medium text-sm px-2">
+            自定义
           </button>
         </div>
       </header>
-
-      <!-- 余生闹钟入口卡片 -->
-      <section class="mb-6">
-        <div class="home-life-entry" id="home-life-entry">
-          <div>
-            <p class="home-life-entry-title">你 <span id="home-life-age">--</span> 岁了</p>
-            <p class="home-life-entry-sub">看看余生还能体验多少美好 →</p>
-          </div>
-          <span class="home-life-entry-arrow">⏰</span>
-        </div>
-      </section>
 
       <!-- 今日格言 -->
       <section class="mb-6">
@@ -80,6 +65,56 @@
           <p class="quote-author">— 余秋雨</p>
         </div>
       </section>
+
+      <!-- AI 目标拆解入口 -->
+      <section class="mb-4">
+        <div id="goal-breakdown-entry" class="goal-entry-card">
+          <div class="goal-entry-icon">🎯</div>
+          <div class="goal-entry-content">
+            <h3 class="goal-entry-title">有个大目标？让 AI 帮你拆解</h3>
+            <p class="goal-entry-desc">输入目标 + 期限，生成可执行的 3 阶段路线图</p>
+          </div>
+          <div class="goal-entry-arrow">→</div>
+        </div>
+      </section>
+
+      <!-- 清单统计概览 -->
+      <section class="mb-4">
+        <div class="lists-overview">
+          <div class="lists-overview-item">
+            <span class="lists-overview-value" id="lists-total">0</span>
+            <span class="lists-overview-label">总清单</span>
+          </div>
+          <div class="lists-overview-divider"></div>
+          <div class="lists-overview-item">
+            <span class="lists-overview-value" id="lists-completed">0</span>
+            <span class="lists-overview-label">已完成</span>
+          </div>
+          <div class="lists-overview-divider"></div>
+          <div class="lists-overview-item">
+            <span class="lists-overview-value" id="lists-tasks">0</span>
+            <span class="lists-overview-label">总任务</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 清单卡片容器 -->
+      <section>
+        <div id="list-cards-container">
+          <!-- 卡片将通过 JavaScript 动态生成 -->
+        </div>
+
+        <!-- 添加清单按钮（编辑模式时显示） -->
+        <button id="add-list-btn" class="add-list-card hidden">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          创建新清单
+        </button>
+      </section>
+
+      <!-- 长按拖动排序提示 -->
+      <p class="drag-sort-hint">长按拖动排序</p>
 
     </div>
 
@@ -181,7 +216,7 @@
       <!-- 头部 -->
       <header class="mb-4">
         <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
-          清单大全
+          清单
         </h1>
         <p class="text-apple-gray text-sm">
           已添加 <span id="template-added-count">0</span> / <span id="template-total-count">0</span> 个清单
@@ -203,6 +238,22 @@
         <!-- 模板将通过 JavaScript 动态生成 -->
       </section>
 
+    </div>
+
+    <!-- ==================== 人生进度占位视图 ==================== -->
+    <div id="lifeprogress-view" class="hidden">
+      <header class="pt-6 pb-4">
+        <div class="flex items-center justify-between">
+          <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+            人生进度
+          </h1>
+        </div>
+      </header>
+      <div class="flex flex-col items-center justify-center py-20 text-apple-gray">
+        <div class="text-6xl mb-4">⏳</div>
+        <p class="text-lg font-medium">人生进度功能开发中</p>
+        <p class="text-sm mt-2">敬请期待阶段 3</p>
+      </div>
     </div>
 
     <!-- ==================== 人生轴页视图 ==================== -->
@@ -559,23 +610,19 @@
   <nav class="bottom-nav">
     <div class="nav-item active" data-view="home">
       <span class="nav-icon">🏠</span>
-      <span class="nav-label">首页</span>
-    </div>
-    <div class="nav-item" data-view="lifeclock">
-      <span class="nav-icon">⏰</span>
-      <span class="nav-label">余生</span>
-    </div>
-    <div class="nav-item" data-view="lists">
-      <span class="nav-icon">📋</span>
-      <span class="nav-label">进度</span>
+      <span class="nav-label">HOME</span>
     </div>
     <div class="nav-item" data-view="templates">
-      <span class="nav-icon">📚</span>
-      <span class="nav-label">大全</span>
+      <span class="nav-icon">▦</span>
+      <span class="nav-label">清单</span>
     </div>
     <div class="nav-item" data-view="timeline">
-      <span class="nav-icon">📅</span>
+      <span class="nav-icon">◉</span>
       <span class="nav-label">人生轴</span>
+    </div>
+    <div class="nav-item" data-view="lifeprogress">
+      <span class="nav-icon">▭</span>
+      <span class="nav-label">人生进度</span>
     </div>
     <div class="nav-item" data-view="profile">
       <span class="nav-icon">👤</span>
