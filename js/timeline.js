@@ -189,7 +189,15 @@ const TimelineManager = {
       return false;
     }
     const events = StorageManager.getTimeline();
-    const id = 'e_' + (this._nextId++);
+    // 扫描现有 e_ 序号，取最大 +1，避免刷新后 _nextId 重置导致重复
+    let maxSeq = 0;
+    events.forEach(e => {
+      if (e && typeof e.id === 'string' && e.id.startsWith('e_')) {
+        const n = parseInt(e.id.slice(2), 10);
+        if (Number.isFinite(n) && n > maxSeq) maxSeq = n;
+      }
+    });
+    const id = 'e_' + (maxSeq + 1);
     events.push({ id, year: Number(year), text: text.trim() });
     StorageManager.setTimeline(events);
     this.renderTimelinePage();
@@ -289,7 +297,8 @@ const TimelineManager = {
           ${this._generateShareCardHTML(sorted, span)}
         </div>
         <div class="share-actions">
-          <button class="share-btn share-btn-image" onclick="TimelineManager._downloadShareImage()">💾 保存图片</button>
+          <button class="share-btn share-btn-danger" onclick="TimelineManager._downloadShareImage()">💾 保存图片</button>
+          <button class="share-btn share-btn-success" onclick="TimelineManager._shareTimeline()">🔗 分享</button>
         </div>
       </div>
     `;
@@ -326,6 +335,21 @@ const TimelineManager = {
         </div>
       </div>
     `;
+  },
+
+  _shareTimeline() {
+    const events = StorageManager.getTimeline();
+    const sorted = TimelineEngine.sortByYear(events);
+    const span = TimelineEngine.yearSpan(sorted);
+    const title = '我的人生时间轴';
+    const text = sorted.length > 0
+      ? `共 ${sorted.length} 件事，年份跨度 ${span ? span.min + ' — ' + span.max : '—'}。记录每一段认真活过的日子。`
+      : '我的人生时间轴，等待记录第一段故事。';
+    if (navigator.share) {
+      navigator.share({ title, text }).catch(() => {});
+    } else {
+      this.showToast('长按卡片图片即可保存分享');
+    }
   },
 
   _downloadShareImage() {

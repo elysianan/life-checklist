@@ -2741,6 +2741,16 @@ body {
   color: white;
 }
 
+.share-btn-danger {
+  background: linear-gradient(135deg, #FF3B30 0%, #FF2D55 100%);
+  color: white;
+}
+
+.share-btn-success {
+  background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
+  color: white;
+}
+
 .share-toast {
   position: fixed;
   bottom: 100px;

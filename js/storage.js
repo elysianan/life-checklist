@@ -402,7 +402,7 @@ const StorageManager = {
     if (this.isTimelineMigrated()) return;
     try {
       const old = this.getTimeline();
-      if (old.length > 0 && old[0] && ('date' in old[0] || 'title' in old[0])) {
+      if (old.length > 0 && old.some(e => e && ('date' in e || 'title' in e))) {
         const migrated = TimelineEngine.migrate(old);
         this.setTimeline(migrated);
       }
