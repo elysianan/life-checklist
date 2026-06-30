@@ -90,7 +90,6 @@ function initApp() {
   initViewElements();
 
   SettingsManager.init();
-  SoundManager.init();
   StorageManager.initializeData();
 
   // 更新连续打卡状态（处理新的一天/断签）
@@ -829,12 +828,6 @@ function bindTagTapLongPress(tag, listId, taskId, currentCompleted) {
  */
 function applyTaskToggleEffects(listId, taskId, completed, anchorEl) {
   AppState.lists = StorageManager.updateTaskStatus(listId, taskId, completed);
-
-  if (completed) {
-    SoundManager.playComplete();
-  } else {
-    SoundManager.playUncheck();
-  }
 
   if (completed) {
     AnimationManager.createCheckAnimation(anchorEl);

@@ -16,3 +16,8 @@ desktop.ini
 review-diff.txt
 /screenshot-*.png
 test-screenshots/
+
+# Node 依赖（仅本地视觉验证 Playwright 用，项目本身是纯静态，不入库）
+node_modules/
+package.json
+package-lock.json

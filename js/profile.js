@@ -130,11 +130,9 @@ const ProfileManager = {
     const container = document.getElementById('settings-list');
     if (!container) return;
 
-    const soundEnabled = SettingsManager.getSoundEnabled();
     const currentTheme = SettingsManager.getTheme();
 
     const settings = [
-      { icon: '🔊', label: `音效 ${soundEnabled ? '开启' : '关闭'}`, action: 'toggleSound' },
       { icon: '🌙', label: `主题：${currentTheme === 'auto' ? '跟随系统' : currentTheme === 'dark' ? '深色' : '浅色'}`, action: 'changeTheme' },
       { icon: '🎂', label: '修改出生日期', action: 'editBirthDate' },
       { icon: '📤', label: '导出数据', action: 'exportData' },
@@ -180,9 +178,6 @@ const ProfileManager = {
 
   handleSettingAction(action) {
     switch (action) {
-      case 'toggleSound':
-        this.toggleSound();
-        break;
       case 'changeTheme':
         this.changeTheme();
         break;
@@ -202,13 +197,6 @@ const ProfileManager = {
         this.showAbout();
         break;
     }
-  },
-
-  toggleSound() {
-    const enabled = SettingsManager.getSoundEnabled();
-    SettingsManager.setSoundEnabled(!enabled);
-    this.renderSettingsList();
-    this.showToast(`音效已${!enabled ? '开启' : '关闭'}`);
   },
 
   changeTheme() {

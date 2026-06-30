@@ -5,7 +5,6 @@
 const SettingsManager = {
   KEYS: {
     THEME: 'life_checklist_theme',
-    SOUND: 'life_checklist_sound',
     SORT: 'life_checklist_sort',
     AI_CONFIG: 'life_checklist_ai_config'
   },
@@ -32,16 +31,6 @@ const SettingsManager = {
       html.classList.remove('dark');
       html.style.colorScheme = 'light dark';
     }
-  },
-
-  getSoundEnabled() {
-    const value = localStorage.getItem(this.KEYS.SOUND);
-    return value !== 'false';
-  },
-
-  setSoundEnabled(enabled) {
-    localStorage.setItem(this.KEYS.SOUND, enabled.toString());
-    SoundManager.enabled = enabled;
   },
 
   getSortMethod() {
@@ -101,7 +90,6 @@ const SettingsManager = {
 
   init() {
     this.applyTheme(this.getTheme());
-    SoundManager.enabled = this.getSoundEnabled();
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if (this.getTheme() === 'auto') {

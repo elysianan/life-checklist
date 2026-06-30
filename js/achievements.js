@@ -49,7 +49,6 @@ const AchievementManager = {
     achievements.forEach((achievement, index) => {
       setTimeout(() => {
         this.showUnlockPopup(achievement);
-        SoundManager.playAchievement();
       }, index * 1500);
     });
   },
