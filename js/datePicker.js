@@ -27,6 +27,49 @@ const DatePickerManager = {
 
   _range(a, b) { const r = []; for (let i = a; i <= b; i++) r.push(i); return r; },
 
+  _yearRange() { return this._range(1920, new Date().getFullYear() + 1); },
+
+  /**
+   * 单列年份滚轮：复用 date-picker-mask，仅显示年份列
+   * @param {number|string} currentYear - 当前选中年份
+   * @param {function} onConfirm - 确认回调 (year) => {}
+   */
+  openYear(currentYear, onConfirm) {
+    const mask = document.getElementById('date-picker-mask');
+    const card = mask.querySelector('.date-picker-cols');
+    const units = mask.querySelector('.date-picker-units');
+
+    // 切换为单列年份模式
+    card.innerHTML = '<ul class="dp-col" id="dp-year-only"></ul>';
+    if (units) units.innerHTML = '<span>年</span>';
+
+    const ul = document.getElementById('dp-year-only');
+    const years = this._yearRange();
+    const sel = years.includes(Number(currentYear)) ? Number(currentYear) : 2000;
+    this._fill(ul, years, sel);
+
+    mask.classList.remove('hidden');
+
+    document.getElementById('date-picker-cancel').onclick = () => {
+      mask.classList.add('hidden');
+      this._restoreCols(card, units);
+    };
+    document.getElementById('date-picker-confirm').onclick = () => {
+      const y = this._centerValue(ul);
+      mask.classList.add('hidden');
+      this._restoreCols(card, units);
+      if (onConfirm) onConfirm(y);
+    };
+  },
+
+  /**
+   * 还原三列日期结构（openYear 用后复位，避免影响生日选择器）
+   */
+  _restoreCols(card, units) {
+    card.innerHTML = '<ul class="dp-col" id="dp-year"></ul><ul class="dp-col" id="dp-month"></ul><ul class="dp-col" id="dp-day"></ul>';
+    if (units) units.innerHTML = '<span>年</span><span>月</span><span>日</span>';
+  },
+
   _fill(ul, values, selected) {
     ul.innerHTML = values.map(v => `<li data-v="${v}">${v}</li>`).join('');
     const idx = Math.max(0, values.indexOf(selected));

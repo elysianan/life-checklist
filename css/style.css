@@ -2179,6 +2179,17 @@ body {
   color: var(--text);
 }
 
+.tl-year-display {
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tl-year-display:empty::before {
+  content: '点击选择年份';
+  color: var(--text-3);
+}
+
 /* ==================== 分享功能 ==================== */
 
 .share-overlay {
@@ -3122,7 +3133,7 @@ body {
 /* ===== 日期滚轮选择器 ===== */
 .date-picker-mask {
   position: fixed; inset: 0; background: rgba(0,0,0,.35);
-  display: flex; align-items: flex-end; z-index: 1000;
+  display: flex; align-items: flex-end; z-index: 1100;
 }
 .date-picker-card { width: 100%; background: var(--surface); border-radius: 20px 20px 0 0; padding-bottom: 12px; }
 .date-picker-bar { display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }

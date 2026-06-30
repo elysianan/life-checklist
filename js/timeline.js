@@ -244,7 +244,8 @@ const TimelineManager = {
         <h3>${title}</h3>
         <div class="modal-input-container" style="text-align:left;">
           <label class="form-label">年份</label>
-          <input type="number" class="form-input" id="tl-modal-year" value="${yearVal}" placeholder="例如 2020">
+          <button type="button" class="form-input tl-year-display" id="tl-modal-year-btn">${yearVal || '点击选择年份'}</button>
+          <input type="hidden" id="tl-modal-year" value="${yearVal}">
           <label class="form-label" style="margin-top:1rem;">描述</label>
           <textarea class="form-textarea" id="tl-modal-text" rows="3" placeholder="记录这件大事...">${textVal}</textarea>
         </div>
@@ -257,6 +258,15 @@ const TimelineManager = {
     `;
 
     document.body.appendChild(overlay);
+
+    const yearBtn = document.getElementById('tl-modal-year-btn');
+    const yearHidden = document.getElementById('tl-modal-year');
+    yearBtn.addEventListener('click', () => {
+      DatePickerManager.openYear(yearHidden.value || new Date().getFullYear(), (y) => {
+        yearHidden.value = y;
+        yearBtn.textContent = y;
+      });
+    });
 
     document.getElementById('tl-modal-cancel').addEventListener('click', () => overlay.remove());
     document.getElementById('tl-modal-confirm').addEventListener('click', () => {
