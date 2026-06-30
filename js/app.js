@@ -126,8 +126,8 @@ function bindEvents() {
   if (tlShareBtn) tlShareBtn.addEventListener('click', () => TimelineManager.showShareCard());
   const tlLayoutSingle = document.getElementById('timeline-layout-single');
   const tlLayoutDouble = document.getElementById('timeline-layout-double');
-  if (tlLayoutSingle) tlLayoutSingle.addEventListener('click', () => TimelineManager.toggleLayout());
-  if (tlLayoutDouble) tlLayoutDouble.addEventListener('click', () => TimelineManager.toggleLayout());
+  if (tlLayoutSingle) tlLayoutSingle.addEventListener('click', () => TimelineManager.setLayout('single'));
+  if (tlLayoutDouble) tlLayoutDouble.addEventListener('click', () => TimelineManager.setLayout('double'));
   const tlAddBtn = document.getElementById('timeline-add-btn');
   if (tlAddBtn) tlAddBtn.addEventListener('click', () => TimelineManager.showAddModal());
 

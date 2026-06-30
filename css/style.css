@@ -1193,6 +1193,59 @@ body {
   color: var(--danger);
 }
 
+/* ==================== 人生轴·单列/双侧 ==================== */
+.timeline-single-wrap { position: relative; padding: 0.5rem 0; }
+.timeline-single-row { display: flex; gap: 0.75rem; align-items: stretch; }
+.timeline-single-left {
+  position: relative; flex: 0 0 56px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.timeline-single-year { font-size: 0.875rem; font-weight: 700; color: var(--accent); padding-top: 0.9rem; }
+.timeline-single-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); margin-top: 0.35rem; z-index: 1;
+  box-shadow: 0 0 0 3px var(--accent-weak);
+}
+.timeline-single-line { flex: 1; width: 2px; background: var(--border); margin-top: 0.2rem; }
+.timeline-single-row:last-child .timeline-single-line { display: none; }
+.timeline-single-card {
+  flex: 1; background: var(--surface); border-radius: var(--radius);
+  padding: 0.85rem 1rem; margin-bottom: 0.85rem;
+  box-shadow: var(--shadow); cursor: pointer; transition: transform 0.15s ease;
+}
+.timeline-single-card:active { transform: scale(0.985); }
+.timeline-single-text { margin: 0; color: var(--text); font-size: 0.9375rem; line-height: 1.5; }
+
+.timeline-double-wrap { position: relative; padding: 0.5rem 0; }
+.timeline-double-axis {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+  background: var(--border); transform: translateX(-50%);
+}
+.timeline-double-row { display: flex; align-items: center; margin-bottom: 1rem; position: relative; }
+.timeline-double-side { flex: 1; display: flex; }
+.timeline-double-side.left { justify-content: flex-end; padding-right: 1.25rem; }
+.timeline-double-side.right { justify-content: flex-start; padding-left: 1.25rem; }
+.timeline-double-center { flex: 0 0 0; position: relative; }
+.timeline-double-dot {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 3px var(--accent-weak); z-index: 1;
+}
+.timeline-double-card {
+  max-width: 100%; background: var(--surface); border-radius: var(--radius);
+  padding: 0.75rem 0.9rem; box-shadow: var(--shadow); cursor: pointer;
+}
+.timeline-double-year { display: block; font-size: 0.8125rem; font-weight: 700; color: var(--accent); margin-bottom: 0.25rem; }
+.timeline-double-text { margin: 0; color: var(--text); font-size: 0.875rem; line-height: 1.45; }
+
+/* ==================== 布局切换按钮·选中态 ==================== */
+#timeline-layout-single, #timeline-layout-double {
+  background: var(--surface-2); color: var(--text-2);
+}
+#timeline-layout-single.active, #timeline-layout-double.active {
+  background: var(--accent); color: #fff;
+}
+
 /* ==================== 成就页面样式 ==================== */
 
 .achievement-header {

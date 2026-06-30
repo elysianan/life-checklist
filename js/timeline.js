@@ -169,10 +169,9 @@ const TimelineManager = {
     return StorageManager.getTimelineLayout();
   },
 
-  toggleLayout() {
-    const current = this.getLayout();
-    const next = current === 'single' ? 'double' : 'single';
-    StorageManager.setTimelineLayout(next);
+  setLayout(layout) {
+    if (layout !== 'single' && layout !== 'double') return;
+    StorageManager.setTimelineLayout(layout);
     this.renderTimelinePage();
   },
 
