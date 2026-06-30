@@ -1070,7 +1070,7 @@ body {
 }
 
 .timeline-empty-btn {
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 0.75rem;
@@ -1223,12 +1223,39 @@ body {
 .timeline-double-year { display: block; font-size: 0.8125rem; font-weight: 700; color: var(--accent); margin-bottom: 0.25rem; }
 .timeline-double-text { margin: 0; color: var(--text); font-size: 0.875rem; line-height: 1.45; }
 
+.segmented-control {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: 9999px;
+  padding: 2px;
+}
+
+.segmented-btn {
+  flex: 1;
+  padding: 0.5rem 0;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.segmented-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
 /* ==================== 布局切换按钮·选中态 ==================== */
 #timeline-layout-single, #timeline-layout-double {
-  background: var(--surface-2); color: var(--text-2);
+  background: transparent;
+  color: var(--text-2);
 }
 #timeline-layout-single.active, #timeline-layout-double.active {
-  background: var(--accent); color: #fff;
+  background: var(--accent);
+  color: #fff;
 }
 
 /* ==================== 成就页面样式 ==================== */
