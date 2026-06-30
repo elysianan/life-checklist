@@ -303,7 +303,7 @@ const ProfileManager = {
       <div class="modal-content about-modal">
         <div class="about-logo">✨</div>
         <h3>人生已完成清单</h3>
-        <p class="about-version">v5.0.0</p>
+        <p class="about-version">v6.7.0</p>
         <p class="about-desc">记录人生每一个值得铭记的时刻</p>
         <div class="about-features">
           <span>🎯 目标追踪</span>

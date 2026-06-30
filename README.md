@@ -1,5 +1,7 @@
 # 人生已完成清单 ✨
 
+![version](https://img.shields.io/badge/version-v6.7.0-blue)
+
 一款极简风格的人生清单 Web App，帮助你记录、追踪并珍惜人生中想完成的每一件事，并把「人生倒计时」的焦虑重塑为对余生的珍惜。
 
 ## 🎯 核心概念（5 Tab）

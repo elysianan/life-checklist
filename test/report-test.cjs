@@ -26,9 +26,9 @@ const files = ['js/data.js', 'js/storage.js', 'js/settings.js', 'js/aiService.js
   .filter(f => fs.existsSync(path.join(root, f)));
 let code = files.map(f => fs.readFileSync(path.join(root, f), 'utf8')).join('\n');
 
-// 准备 mock 数据（完成日期为今天）
+// 准备 mock 数据（完成日期为今天，使用本地日期避免时区偏差）
 const today = new Date();
-const T = today.toISOString().split('T')[0];
+const T = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 const SEED_LISTS = [
   { id: 'travel', emoji: '🌍', title: '环游世界', description: '', color: '#007AFF', category: '旅行',
     tasks: [
