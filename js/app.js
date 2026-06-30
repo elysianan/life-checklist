@@ -1,4 +1,24 @@
 /**
+ * 降低 HEX 颜色饱和度，用于清单卡左侧色条
+ * @param {string} hex - #RRGGBB
+ * @param {number} ratio - 0~1 降饱和比例
+ */
+function desaturateColor(hex, ratio) {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.substring(0, 2), 16) / 255;
+  const g = parseInt(clean.substring(2, 4), 16) / 255;
+  const b = parseInt(clean.substring(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const newR = r + (l - r) * ratio;
+  const newG = g + (l - g) * ratio;
+  const newB = b + (l - b) * ratio;
+  const toHex = (v) => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+}
+
+/**
  * 人生已完成清单 - 主应用逻辑
  */
 
@@ -356,29 +376,26 @@ function createListCard(list, progress) {
   card.className = 'home-list-card';
   card.dataset.listId = list.id;
 
-  // 任务预览文本：取前若干个 task.text，空格分隔
-  const previewTasks = list.tasks.slice(0, 8);
-  const previewText = previewTasks.map(t => t.text).join(' ');
+  const barColor = desaturateColor(list.color || '#007AFF', 0.2);
 
   card.innerHTML = `
-    <div class="home-list-card-header" style="background: ${list.color || '#007AFF'}">
-      <span class="home-list-card-title">${list.title}</span>
-      <span class="home-list-card-percent">${Math.round(progress.percentage)}%</span>
-    </div>
-    <div class="home-list-card-body">
-      <p class="home-list-card-preview">${previewText || '暂无任务'}</p>
+    <span class="card-left-bar" style="--bar-color: ${barColor}"></span>
+    <div class="home-list-card-inner">
+      <span class="home-list-card-emoji">${list.emoji}</span>
+      <div class="home-list-card-info">
+        <div class="home-list-card-title">${list.title}</div>
+        <div class="home-list-card-percent">${Math.round(progress.percentage)}%</div>
+      </div>
     </div>
     <button class="home-list-card-delete" data-list-id="${list.id}">×</button>
   `;
 
-  // 点击卡片进入详情
   card.addEventListener('click', (e) => {
     if (e.target.closest('.home-list-card-delete')) return;
     if (AppState.isEditing) return;
     showListDetail(list.id);
   });
 
-  // 删除角标点击
   const deleteBtn = card.querySelector('.home-list-card-delete');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', (e) => {

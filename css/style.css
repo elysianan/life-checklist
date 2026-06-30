@@ -63,7 +63,7 @@ body {
 .home-list-card {
   background: var(--surface);
   border-radius: var(--radius);
-  margin-bottom: 0.75rem;
+  margin-bottom: 10px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -77,43 +77,36 @@ body {
   transform: scale(0.98);
 }
 
-.home-list-card-header {
+.home-list-card-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.625rem 1rem;
-  color: white;
-  font-weight: 600;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem 0.875rem calc(1rem + 4px);
 }
 
-.home-list-card-title {
-  font-size: 0.9375rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.home-list-card-percent {
-  font-size: 0.875rem;
-  opacity: 0.95;
+.home-list-card-emoji {
+  font-size: 20px;
   flex-shrink: 0;
 }
 
-.home-list-card-body {
-  padding: 0.75rem 1rem;
-  background: var(--surface-2);
+.home-list-card-info {
+  flex: 1;
+  min-width: 0;
 }
 
-.home-list-card-preview {
-  font-size: 0.8125rem;
-  color: var(--text-2);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.home-list-card-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 0;
+  margin-bottom: 2px;
+}
+
+.home-list-card-percent {
+  font-size: 13px;
+  color: var(--text-2);
 }
 
 /* 编辑模式：显示删除角标 */
@@ -440,6 +433,7 @@ body {
   border-radius: var(--radius);
   padding: 1rem;
   box-shadow: var(--shadow);
+  margin-bottom: 0.75rem;
 }
 
 .lists-overview-item {
@@ -447,20 +441,20 @@ body {
 }
 
 .lists-overview-value {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
   color: var(--text);
   display: block;
 }
 
 .lists-overview-label {
-  font-size: 0.75rem;
+  font-size: 11px;
   color: var(--text-2);
 }
 
 .lists-overview-divider {
   width: 1px;
-  height: 30px;
+  height: 24px;
   background: var(--border);
 }
 
