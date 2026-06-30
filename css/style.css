@@ -1739,7 +1739,7 @@ body {
   align-items: center;
   padding: 0.5rem 0.5rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
   color: var(--text-2);
 }
 
@@ -1748,12 +1748,13 @@ body {
 }
 
 .nav-icon {
-  font-size: 1.25rem;
+  width: 24px;
+  height: 24px;
   margin-bottom: 0.25rem;
 }
 
 .nav-label {
-  font-size: 0.625rem;
+  font-size: 10px;
   font-weight: 500;
 }
 
