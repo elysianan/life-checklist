@@ -1545,102 +1545,80 @@ body {
 
 /* ==================== 个人中心 ==================== */
 
-.profile-header {
-  background: linear-gradient(135deg, #FF9500 0%, #FF2D55 100%);
-  border-radius: 1.5rem;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-  color: white;
-  text-align: center;
+.profile-user-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow);
+  cursor: pointer;
 }
 
 .profile-avatar {
-  width: 4rem;
-  height: 4rem;
-  background: rgba(255, 255, 255, 0.3);
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 0.5rem;
-  font-size: 2rem;
+  flex-shrink: 0;
 }
 
-.profile-name {
-  font-size: 1.125rem;
-  font-weight: 700;
+.profile-user-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name-level {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
 
-.profile-level {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.3);
-  padding: 0.2rem 0.6rem;
-  border-radius: 1rem;
-  font-size: 0.8125rem;
+.profile-name {
+  font-size: 17px;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  color: var(--text);
 }
 
-.profile-level-progress {
-  background: rgba(255, 255, 255, 0.3);
-  height: 5px;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 0.35rem;
-}
-
-.profile-level-bar {
-  height: 100%;
-  background: white;
-  border-radius: 3px;
-  transition: width 0.5s ease;
+.profile-level {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent-weak);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 10px;
 }
 
 .profile-level-text {
-  font-size: 0.75rem;
-  opacity: 0.9;
-}
-
-.profile-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.4rem;
-  margin-bottom: 0.75rem;
-}
-
-.profile-stat-item {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 0.75rem 0.25rem;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-
-.profile-stat-value {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.2rem;
-}
-
-.profile-stat-label {
-  font-size: 0.625rem;
+  font-size: 13px;
   color: var(--text-2);
+}
+
+.profile-user-arrow {
+  color: var(--text-3);
+  flex-shrink: 0;
 }
 
 .profile-section {
   background: var(--surface);
   border-radius: var(--radius);
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   margin-bottom: 0.75rem;
   box-shadow: var(--shadow);
 }
 
 .profile-section-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
+  font-size: 13px;
+  color: var(--text-2);
   margin-bottom: 0.75rem;
 }
 
@@ -1651,8 +1629,8 @@ body {
 }
 
 .achievement-preview-badge {
-  width: 3rem;
-  height: 3rem;
+  width: 32px;
+  height: 32px;
   background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
   border-radius: 50%;
   display: flex;
@@ -1661,19 +1639,20 @@ body {
 }
 
 .preview-emoji {
-  font-size: 1.25rem;
+  font-size: 16px;
 }
 
 .empty-achievements {
   text-align: center;
-  padding: 1rem;
+  padding: 0.5rem;
   color: var(--text-2);
+  font-size: 13px;
 }
 
 .empty-emoji {
-  font-size: 2rem;
+  font-size: 20px;
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 /* ==================== 设置列表 ==================== */
@@ -1681,8 +1660,8 @@ body {
 .setting-item {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
-  padding: 0.75rem 0;
+  gap: 0.75rem;
+  padding: 10px 0;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
 }
@@ -1692,13 +1671,23 @@ body {
 }
 
 .setting-icon {
-  font-size: 1.125rem;
+  width: 18px;
+  height: 18px;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .setting-label {
   flex: 1;
-  font-size: 0.9375rem;
+  font-size: 15px;
   color: var(--text);
+}
+
+.setting-value {
+  font-size: 13px;
+  color: var(--text-2);
 }
 
 .setting-arrow {

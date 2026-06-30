@@ -459,55 +459,31 @@
     <!-- ==================== 个人中心视图 ==================== -->
     <div id="profile-view" class="hidden">
 
-      <!-- 返回按钮 -->
-      <div class="pt-6 pb-4">
-        <button
-          id="profile-back-btn"
-          class="flex items-center gap-2 text-apple-blue font-medium"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M15 18l-6-6 6-6"/>
+      <!-- 用户信息区 -->
+      <div class="profile-user-row">
+        <div class="profile-avatar">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
           </svg>
-          返回
-        </button>
-      </div>
-
-      <!-- 个人中心头部 -->
-      <div class="profile-header">
-        <div class="profile-avatar">👤</div>
-        <div class="profile-name">人生探索者</div>
-        <div class="profile-level" id="profile-level">Lv.0</div>
-        <div class="profile-age" id="profile-age" style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 1rem;"></div>
-
-        <div class="profile-level-progress">
-          <div class="profile-level-bar" id="level-progress" style="width: 0%"></div>
         </div>
-        <div class="profile-level-text" id="level-progress-text">距离下一级还需 1 个任务</div>
-      </div>
-
-      <!-- 统计数据 -->
-      <div class="profile-stats">
-        <div class="profile-stat-item">
-          <div class="profile-stat-value" id="profile-total-completed">0</div>
-          <div class="profile-stat-label">已完成</div>
+        <div class="profile-user-meta">
+          <div class="profile-name-level">
+            <span class="profile-name">人生探索者</span>
+            <span class="profile-level" id="profile-level">Lv.0</span>
+          </div>
+          <div class="profile-level-text" id="level-progress-text">距离下一级还需 1 个任务</div>
         </div>
-        <div class="profile-stat-item">
-          <div class="profile-stat-value" id="profile-total-tasks">0</div>
-          <div class="profile-stat-label">总任务</div>
-        </div>
-        <div class="profile-stat-item">
-          <div class="profile-stat-value" id="profile-achievements">0</div>
-          <div class="profile-stat-label">成就</div>
-        </div>
-        <div class="profile-stat-item">
-          <div class="profile-stat-value" id="profile-today">0</div>
-          <div class="profile-stat-label">今日</div>
+        <div class="profile-user-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
         </div>
       </div>
 
       <!-- 最近成就 -->
       <div class="profile-section">
-        <div class="profile-section-title">🏆 最近成就</div>
+        <div class="profile-section-title">最近成就</div>
         <div class="achievement-preview" id="profile-achievements-preview">
           <!-- 成就将通过 JavaScript 动态生成 -->
         </div>
@@ -515,13 +491,9 @@
 
       <!-- 设置列表 -->
       <div class="profile-section">
-        <div class="profile-section-title">⚙️ 设置</div>
+        <div class="profile-section-title">设置</div>
         <div id="settings-list">
           <!-- 设置项将通过 JavaScript 动态生成 -->
-        </div>
-        <div class="setting-item" id="setting-life-expectancy">
-          <span class="setting-label">预期寿命</span>
-          <span class="setting-value" id="life-expectancy-value">100 岁</span>
         </div>
       </div>
 

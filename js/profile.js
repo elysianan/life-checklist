@@ -5,52 +5,15 @@
 const ProfileManager = {
   renderProfilePage() {
     const stats = StorageManager.getOverallStats();
-    const achievements = StorageManager.getUnlockedAchievements();
-    const birthDate = StorageManager.getBirthDate();
 
-    this.updateUserInfo(birthDate, stats);
-    this.updateProfileStats(stats, achievements);
+    this.updateUserInfo(stats);
     this.renderAchievementPreview();
     this.renderSettingsList();
-    this.renderReportEntry();
   },
 
-  /** 在设置区上方插入报告入口卡片（只插一次） */
-  renderReportEntry() {
-    const section = document.querySelector('#profile-view .profile-section');
-    if (!section || document.getElementById('profile-report-entry')) return;
-    const btn = document.createElement('button');
-    btn.id = 'profile-report-entry';
-    btn.className = 'report-entry-card';
-    btn.innerHTML = `
-      <span class="entry-emoji">✨</span>
-      <span class="entry-text">
-        <span class="entry-title">AI 人生报告</span>
-        <span class="entry-sub">一键生成你的阶段总结</span>
-      </span>`;
-    btn.addEventListener('click', () => ReportManager.open());
-    section.insertAdjacentElement('beforebegin', btn);
-  },
-
-  updateUserInfo(birthDate, stats) {
-    if (birthDate) {
-      const birth = new Date(birthDate);
-      const today = new Date();
-      let age = today.getFullYear() - birth.getFullYear();
-      const monthDiff = today.getMonth() - birth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-      }
-      document.getElementById('profile-age').textContent = age + ' 岁';
-    } else {
-      document.getElementById('profile-age').textContent = '';
-    }
-
+  updateUserInfo(stats) {
     const level = this.calculateLevel(stats.totalCompleted);
     document.getElementById('profile-level').textContent = 'Lv.' + level;
-
-    const nextLevelProgress = this.calculateLevelProgress(stats.totalCompleted);
-    document.getElementById('level-progress').style.width = nextLevelProgress + '%';
     document.getElementById('level-progress-text').textContent =
       `距离下一级还需 ${this.getTasksToNextLevel(stats.totalCompleted)} 个任务`;
   },
@@ -91,13 +54,6 @@ const ProfileManager = {
     return thresholds[level + 1] - completed;
   },
 
-  updateProfileStats(stats, achievements) {
-    document.getElementById('profile-total-completed').textContent = stats.totalCompleted;
-    document.getElementById('profile-total-tasks').textContent = stats.totalTasks;
-    document.getElementById('profile-achievements').textContent = achievements.length;
-    document.getElementById('profile-today').textContent = stats.todayCompleted;
-  },
-
   renderAchievementPreview() {
     const container = document.getElementById('profile-achievements-preview');
     if (!container) return;
@@ -133,12 +89,14 @@ const ProfileManager = {
     const currentTheme = SettingsManager.getTheme();
 
     const settings = [
-      { icon: '🌙', label: `主题：${currentTheme === 'auto' ? '跟随系统' : currentTheme === 'dark' ? '深色' : '浅色'}`, action: 'changeTheme' },
-      { icon: '🎂', label: '修改出生日期', action: 'editBirthDate' },
-      { icon: '📤', label: '导出数据', action: 'exportData' },
-      { icon: '🔄', label: '重置所有进度', action: 'resetProgress' },
-      { icon: '🤖', label: 'AI 助手设置', action: 'aiSettings' },
-      { icon: 'ℹ️', label: '关于应用', action: 'about' }
+      { icon: this._svg('sparkles'), label: 'AI 人生报告', action: 'openReport', hasArrow: true },
+      { icon: this._svg('moon'), label: `主题：${currentTheme === 'auto' ? '跟随系统' : currentTheme === 'dark' ? '深色' : '浅色'}`, action: 'changeTheme', hasArrow: true },
+      { icon: this._svg('cake'), label: '修改出生日期', action: 'editBirthDate', hasArrow: true },
+      { icon: this._svg('lifeExpectancy'), label: '预期寿命', action: 'editLifeExpectancy', value: StorageManager.getLifeExpectancy() + ' 岁', hasArrow: true },
+      { icon: this._svg('export'), label: '导出数据', action: 'exportData', hasArrow: true },
+      { icon: this._svg('ai'), label: 'AI 助手设置', action: 'aiSettings', hasArrow: true },
+      { icon: this._svg('reset'), label: '重置所有进度', action: 'resetProgress', hasArrow: false },
+      { icon: this._svg('info'), label: '关于应用', action: 'about', hasArrow: true }
     ];
 
     container.innerHTML = '';
@@ -149,40 +107,41 @@ const ProfileManager = {
       item.innerHTML = `
         <div class="setting-icon">${setting.icon}</div>
         <div class="setting-label">${setting.label}</div>
-        <div class="setting-arrow">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </div>
+        ${setting.value ? `<span class="setting-value">${setting.value}</span>` : ''}
+        ${setting.hasArrow ? `<div class="setting-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>` : ''}
       `;
       item.addEventListener('click', () => this.handleSettingAction(setting.action));
       container.appendChild(item);
     });
+  },
 
-    const lifeExpItem = document.getElementById('setting-life-expectancy');
-    if (lifeExpItem) {
-      const valEl = document.getElementById('life-expectancy-value');
-      if (valEl) valEl.textContent = StorageManager.getLifeExpectancy() + ' 岁';
-      lifeExpItem.onclick = () => {
-        const cur = StorageManager.getLifeExpectancy();
-        const input = prompt('设置预期寿命（60~120）', String(cur));
-        if (input === null) return;
-        const v = parseInt(input, 10);
-        if (Number.isFinite(v) && v >= 60 && v <= 120) {
-          StorageManager.setLifeExpectancy(v);
-          if (valEl) valEl.textContent = v + ' 岁';
-        }
-      };
-    }
+  _svg(name) {
+    const svgs = {
+      sparkles: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L14.5 8.5L20 11L14.5 13.5L12 19L9.5 13.5L4 11L9.5 8.5L12 3Z"/></svg>',
+      moon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+      cake: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s1.5-2 4-2 4 2 6 2 3-2 6-2"/><path d="M12 6v4"/><path d="M15 7a3 3 0 1 0-6 0"/></svg>',
+      lifeExpectancy: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      export: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+      ai: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+      reset: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+      info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+    };
+    return svgs[name] || '';
   },
 
   handleSettingAction(action) {
     switch (action) {
+      case 'openReport':
+        ReportManager.open();
+        break;
       case 'changeTheme':
         this.changeTheme();
         break;
       case 'editBirthDate':
         this.editBirthDate();
+        break;
+      case 'editLifeExpectancy':
+        this.editLifeExpectancy();
         break;
       case 'resetProgress':
         this.resetProgress();
@@ -196,6 +155,17 @@ const ProfileManager = {
       case 'about':
         this.showAbout();
         break;
+    }
+  },
+
+  editLifeExpectancy() {
+    const cur = StorageManager.getLifeExpectancy();
+    const input = prompt('设置预期寿命（60~120）', String(cur));
+    if (input === null) return;
+    const v = parseInt(input, 10);
+    if (Number.isFinite(v) && v >= 60 && v <= 120) {
+      StorageManager.setLifeExpectancy(v);
+      this.renderSettingsList();
     }
   },
 
