@@ -259,12 +259,12 @@ const TemplateManager = {
    */
   createTemplateCard(template) {
     const isAdded = StorageManager.isTemplateAdded(template.id);
+    const barColor = desaturateColor(template.color || '#007AFF', 0.2);
 
     return `
       <div class="template-card ${isAdded ? 'added' : ''}">
-        <div class="template-card-emoji" style="background: ${template.color}15">
-          ${template.emoji}
-        </div>
+        <span class="card-left-bar" style="--bar-color: ${barColor}"></span>
+        <span class="template-card-emoji">${template.emoji}</span>
         <div class="template-card-content">
           <h4 class="template-card-title">${template.title}</h4>
           <p class="template-card-desc">${template.description}</p>

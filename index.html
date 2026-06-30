@@ -120,7 +120,7 @@
       <header class="pt-6 pb-4">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+            <h1 class="text-[17px] font-semibold text-apple-dark dark:text-white">
               人生进度
             </h1>
             <p class="text-apple-gray text-sm" id="lists-count">
@@ -198,7 +198,7 @@
 
       <!-- 头部 -->
       <header class="mb-4">
-        <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">
+        <h1 class="text-[17px] font-semibold text-apple-dark dark:text-white">
           清单
         </h1>
         <p class="text-apple-gray text-sm">
@@ -209,12 +209,22 @@
       <!-- AI 目标拆解入口（v6.6.0 从首页移到清单 Tab 顶部）-->
       <section class="mb-4">
         <div id="goal-breakdown-entry" class="goal-entry-card">
-          <div class="goal-entry-icon">🎯</div>
+          <div class="goal-entry-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
           <div class="goal-entry-content">
             <h3 class="goal-entry-title">有个大目标？让 AI 帮你拆解</h3>
             <p class="goal-entry-desc">输入目标 + 期限，生成可执行的 3 阶段路线图</p>
           </div>
-          <div class="goal-entry-arrow">→</div>
+          <div class="goal-entry-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
         </div>
       </section>
 

@@ -919,19 +919,20 @@ body {
 
 .category-chip {
   flex-shrink: 0;
-  padding: 0.5rem 1rem;
+  padding: 0.375rem 0.875rem;
   background: var(--surface);
-  border-radius: 1rem;
-  font-size: 0.875rem;
+  border-radius: 9999px;
+  font-size: 13px;
   color: var(--text);
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
 }
 
 .category-chip.active {
   background: var(--accent);
   color: white;
+  border-color: var(--accent);
 }
 
 .category-chip:hover {
@@ -957,12 +958,14 @@ body {
 .template-card {
   background: var(--surface);
   border-radius: var(--radius);
-  padding: 1.25rem;
+  padding: 0.875rem 1rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   box-shadow: var(--shadow);
-  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .template-card:hover {
@@ -975,13 +978,7 @@ body {
 }
 
 .template-card-emoji {
-  font-size: 1.75rem;
-  width: 3rem;
-  height: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.875rem;
+  font-size: 20px;
   flex-shrink: 0;
 }
 
@@ -991,39 +988,39 @@ body {
 }
 
 .template-card-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 500;
   color: var(--text);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.125rem;
 }
 
 .template-card-desc {
-  font-size: 0.75rem;
+  font-size: 13px;
   color: var(--text-2);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .template-card-meta {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .template-card-count,
 .template-card-category {
-  font-size: 0.75rem;
+  font-size: 11px;
   color: var(--text-2);
   background: var(--surface-2);
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.5rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
 }
 
 .template-add-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 0.75rem;
   border: none;
   background: var(--accent);
   color: white;
-  font-size: 0.875rem;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2847,12 +2844,12 @@ body {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, #5E5CE6 0%, #BF5AF2 100%);
-  border-radius: 16px;
+  background: var(--accent);
+  border-radius: var(--radius);
   color: white;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px rgba(94, 92, 230, 0.25);
+  box-shadow: var(--shadow);
 }
 
 .goal-entry-card:active {
@@ -2860,8 +2857,12 @@ body {
 }
 
 .goal-entry-icon {
-  font-size: 32px;
-  line-height: 1;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .goal-entry-content {
@@ -2880,8 +2881,10 @@ body {
 }
 
 .goal-entry-arrow {
-  font-size: 20px;
+  width: 18px;
+  height: 18px;
   opacity: 0.8;
+  flex-shrink: 0;
 }
 
 .goal-modal-overlay {
