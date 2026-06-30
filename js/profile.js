@@ -224,7 +224,7 @@ const ProfileManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content">
-        <h3>⚠️ 确认重置</h3>
+        <h3>确认重置</h3>
         <p class="modal-desc">此操作将清除所有进度数据，无法恢复</p>
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" onclick="this.closest('.modal-overlay').remove()">取消</button>
@@ -271,15 +271,19 @@ const ProfileManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content about-modal">
-        <div class="about-logo">✨</div>
+        <div class="about-logo">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3L14.5 8.5L20 11L14.5 13.5L12 19L9.5 13.5L4 11L9.5 8.5L12 3Z"/>
+          </svg>
+        </div>
         <h3>人生已完成清单</h3>
-        <p class="about-version">v6.7.0</p>
+        <p class="about-version">v6.8.0</p>
         <p class="about-desc">记录人生每一个值得铭记的时刻</p>
         <div class="about-features">
-          <span>🎯 目标追踪</span>
-          <span>📚 清单大全</span>
-          <span>📅 人生轴</span>
-          <span>🏆 成就系统</span>
+          <span>目标追踪</span>
+          <span>清单大全</span>
+          <span>人生轴</span>
+          <span>成就系统</span>
         </div>
         <button class="modal-btn modal-btn-confirm" onclick="this.closest('.modal-overlay').remove()">知道了</button>
       </div>
@@ -304,7 +308,7 @@ const ProfileManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content">
-        <h3>🤖 AI 助手设置</h3>
+        <h3>AI 助手设置</h3>
         <p class="modal-desc">填入大模型 API Key 后，报告将由真实 AI 生成；不填则使用本地规则引擎。Key 仅保存在本地浏览器。</p>
         <div class="ai-form">
           <label class="ai-form-label">厂商</label>
