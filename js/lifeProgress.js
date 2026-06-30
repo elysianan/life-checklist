@@ -160,7 +160,7 @@ const LifeProgressManager = {
     let html = `
       <header class="pt-6 pb-4">
         <div class="flex items-center justify-between">
-          <h1 class="text-3xl font-bold text-apple-dark dark:text-white mb-1">人生进度</h1>
+          <h1 class="text-[17px] font-semibold text-apple-dark dark:text-white">人生进度</h1>
           <button id="lp-add-btn" class="w-10 h-10 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm text-xl">+</button>
         </div>
       </header>
@@ -172,8 +172,8 @@ const LifeProgressManager = {
       const life = this.getLifeExpectancyOf(p);
       const progress = LifeProgressEngine.calcProgress(birth, life, nowMs);
       const ageText = progress.hasBirth ? `${progress.age}/${life}` : '未设置生日';
-      const percentText = progress.hasBirth ? `${progress.percentage}%` : '0%';
       const barWidth = progress.hasBirth ? progress.percentage : 0;
+      const barColor = desaturateColor(p.color || '#007AFF', 0.2);
 
       html += `
         <div class="lp-card" data-id="${p.id}">
@@ -182,8 +182,7 @@ const LifeProgressManager = {
             <span class="lp-card-age">${ageText}</span>
           </div>
           <div class="lp-progress-wrap">
-            <div class="lp-progress-bar" style="width: ${barWidth}%; background: ${p.color};"></div>
-            <span class="lp-progress-text">${percentText}</span>
+            <div class="lp-progress-bar" style="width: ${barWidth}%; background: ${barColor};"></div>
           </div>
         </div>
       `;

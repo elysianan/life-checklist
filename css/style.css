@@ -3180,40 +3180,32 @@ body {
 }
 
 .lp-card-name {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 500;
   color: var(--text);
 }
 
 .lp-card-age {
-  font-size: 0.875rem;
+  font-size: 13px;
   color: var(--text-2);
-  font-weight: 500;
 }
 
 .lp-progress-wrap {
   position: relative;
-  height: 24px;
+  height: 8px;
   background: var(--border);
-  border-radius: 12px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .lp-progress-bar {
   height: 100%;
-  border-radius: 12px;
+  border-radius: 4px;
   transition: width 0.5s ease;
 }
 
 .lp-progress-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text);
-  text-shadow: 0 0 2px var(--surface);
+  display: none;
 }
 
 /* ===== 内联滚轮选择器 ===== */
