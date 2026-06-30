@@ -212,7 +212,7 @@ body {
 
 .progress-circle {
   fill: none;
-  stroke: url(#gradient);
+  stroke: var(--accent);
   stroke-width: 12;
   stroke-linecap: round;
 }
@@ -309,28 +309,23 @@ body {
 /* ==================== 连续打卡卡片 ==================== */
 
 .streak-card {
-  background: linear-gradient(135deg, #FF9500 0%, #FF2D55 100%);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  color: white;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3);
+  box-shadow: var(--shadow);
 }
 
 .streak-icon {
-  font-size: 2.5rem;
-  animation: flame 1.5s ease-in-out infinite;
-}
-
-@keyframes flame {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+  width: 40px;
+  height: 40px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .streak-info {
@@ -345,46 +340,35 @@ body {
 }
 
 .streak-number {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
+  color: var(--text);
 }
 
 .streak-unit {
   font-size: 1rem;
-  opacity: 0.9;
+  color: var(--text-2);
 }
 
 .streak-sub {
   font-size: 0.875rem;
-  opacity: 0.9;
+  color: var(--text-2);
 }
 
 .streak-status {
-  padding: 0.5rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-2);
+  color: var(--text-2);
 }
 
 .streak-status.checked {
-  background: rgba(52, 199, 89, 0.3);
-}
-
-.streak-status.pending {
-  background: rgba(255, 255, 255, 0.2);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
+  background: var(--success);
+  color: white;
 }
 
 /* ==================== 快速统计 ==================== */
@@ -717,10 +701,11 @@ body {
 
 .detail-header {
   text-align: center;
-  padding: 1.25rem 1rem;
-  border-radius: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--radius);
   margin-bottom: 1.5rem;
   color: white;
+  background: var(--accent);
   position: relative;
   overflow: hidden;
 }
@@ -732,7 +717,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .detail-header-inner {
@@ -749,8 +734,8 @@ body {
 }
 
 .detail-title {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
   flex: 1;
   text-align: left;
   white-space: nowrap;
@@ -760,7 +745,7 @@ body {
 
 .detail-percent {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   opacity: 0.95;
   flex-shrink: 0;
 }
@@ -1262,26 +1247,27 @@ body {
 
 .achievement-header {
   text-align: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: white;
+  padding: 1.25rem 1rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  color: var(--text);
+  box-shadow: var(--shadow);
 }
 
 .achievement-header-emoji {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
 }
 
 .achievement-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
 .achievement-count {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
@@ -1427,7 +1413,7 @@ body {
 }
 
 .achievement-close-btn {
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 0.75rem;
@@ -1447,11 +1433,17 @@ body {
 /* ==================== 统计页面 ==================== */
 
 .stats-page-header {
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  color: white;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.stats-page-header h2 {
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .stats-overview {
@@ -1462,20 +1454,21 @@ body {
 }
 
 .stats-overview-item {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
-  padding: 1rem;
+  background: var(--surface-2);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
   text-align: center;
 }
 
 .stats-overview-value {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .stats-overview-label {
   font-size: 0.75rem;
-  opacity: 0.9;
+  color: var(--text-2);
 }
 
 .chart-card {
@@ -2037,7 +2030,7 @@ body {
 }
 
 .task-detail-btn-save {
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  background: var(--accent);
   color: white;
 }
 
@@ -2243,10 +2236,11 @@ body {
 }
 
 .share-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 1rem;
+  background: var(--surface);
+  border-radius: var(--radius);
   padding: 1.5rem;
-  color: white;
+  color: var(--text);
+  box-shadow: var(--shadow);
 }
 
 .share-card-header {
@@ -2257,11 +2251,13 @@ body {
 }
 
 .share-card-logo {
-  font-size: 1.5rem;
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
 }
 
 .share-card-header h4 {
-  font-size: 1rem;
+  font-size: 17px;
   font-weight: 600;
 }
 
@@ -2283,16 +2279,16 @@ body {
 
 .share-stat-label {
   font-size: 0.75rem;
-  opacity: 0.9;
+  color: var(--text-2);
 }
 
 .share-stat-divider {
   width: 1px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--border);
 }
 
 .share-card-highlight {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-2);
   border-radius: 0.75rem;
   padding: 1rem;
   display: flex;
@@ -2311,7 +2307,7 @@ body {
 
 .share-highlight-title {
   font-size: 0.75rem;
-  opacity: 0.9;
+  color: var(--text-2);
   display: block;
 }
 
@@ -2324,7 +2320,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  opacity: 0.9;
+  color: var(--text-2);
 }
 
 .share-actions {
@@ -2353,17 +2349,17 @@ body {
 }
 
 .share-btn-image {
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  background: var(--accent);
   color: white;
 }
 
 .share-btn-danger {
-  background: linear-gradient(135deg, #FF3B30 0%, #FF2D55 100%);
+  background: var(--danger);
   color: white;
 }
 
 .share-btn-success {
-  background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
+  background: var(--success);
   color: white;
 }
 
@@ -2464,12 +2460,12 @@ body {
 }
 
 .modal-btn-confirm {
-  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  background: var(--accent);
   color: white;
 }
 
 .modal-btn-danger {
-  background: linear-gradient(135deg, #FF3B30 0%, #FF2D55 100%);
+  background: var(--danger);
   color: white;
 }
 
@@ -2609,64 +2605,53 @@ body {
 @keyframes report-spin { to { transform: rotate(360deg); } }
 
 .report-card {
-  background: linear-gradient(160deg, #ffffff, #f5f5f7);
-  border-radius: 24px; padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,.06);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
 }
-.dark .report-card { background: linear-gradient(160deg, #1c1c1e, #000); }
+.dark .report-card { background: var(--surface); }
 
-.report-card-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: #1d1d1f; }
-.dark .report-card-title { color: #fff; }
-.report-card-period { font-size: 13px; color: #86868b; margin-bottom: 16px; }
+.report-card-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.dark .report-card-title { color: var(--text); }
+.report-card-period { font-size: 13px; color: var(--text-2); margin-bottom: 16px; }
 
-.report-narrative { font-size: 15px; line-height: 1.8; color: #1d1d1f; margin-bottom: 20px; }
-.dark .report-narrative { color: #f5f5f7; }
+.report-narrative { font-size: 15px; line-height: 1.8; color: var(--text); margin-bottom: 20px; }
+.dark .report-narrative { color: var(--text); }
 .report-narrative p { margin-bottom: 10px; }
 
 .report-metrics { display: flex; gap: 8px; margin-bottom: 20px; }
-.report-metric { flex: 1; background: rgba(0,122,255,.08); border-radius: 14px; padding: 12px; text-align: center; }
-.report-metric-value { font-size: 22px; font-weight: 700; color: #007aff; }
-.report-metric-label { font-size: 12px; color: #86868b; margin-top: 2px; }
+.report-metric { flex: 1; background: var(--accent-weak); border-radius: 14px; padding: 12px; text-align: center; }
+.report-metric-value { font-size: 22px; font-weight: 700; color: var(--accent); }
+.report-metric-label { font-size: 12px; color: var(--text-2); margin-top: 2px; }
 
-.report-section-title { font-size: 14px; font-weight: 600; color: #1d1d1f; margin: 16px 0 8px; }
-.dark .report-section-title { color: #fff; }
+.report-section-title { font-size: 14px; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+.dark .report-section-title { color: var(--text); }
 
 .report-cat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.report-cat-name { font-size: 13px; width: 96px; color: #1d1d1f; }
-.dark .report-cat-name { color: #f5f5f7; }
-.report-cat-bar-bg { flex: 1; height: 8px; background: #e5e5ea; border-radius: 4px; overflow: hidden; }
-.report-cat-bar { height: 100%; background: #34c759; border-radius: 4px; }
-.report-cat-count { font-size: 12px; color: #86868b; width: 32px; text-align: right; }
+.report-cat-name { font-size: 13px; width: 96px; color: var(--text); }
+.dark .report-cat-name { color: var(--text); }
+.report-cat-bar-bg { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.report-cat-bar { height: 100%; background: var(--success); border-radius: 4px; }
+.report-cat-count { font-size: 12px; color: var(--text-2); width: 32px; text-align: right; }
 
 .report-highlights { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
 .report-highlight { flex: 0 0 auto; width: 96px; text-align: center; }
 .report-highlight img { width: 96px; height: 96px; object-fit: cover; border-radius: 12px; }
-.report-highlight span { display: block; font-size: 11px; color: #86868b; margin-top: 4px; }
+.report-highlight span { display: block; font-size: 11px; color: var(--text-2); margin-top: 4px; }
 
-.report-card-footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,.06);
-  display: flex; justify-content: space-between; font-size: 12px; color: #86868b; }
+.report-card-footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); }
 
-.report-empty { text-align: center; padding: 40px 0; color: #86868b; }
+.report-empty { text-align: center; padding: 40px 0; color: var(--text-2); }
 .report-empty .empty-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
 
 .report-actions { display: flex; gap: 8px; margin-top: 16px; }
 .report-action-btn {
-  flex: 1; padding: 12px 0; border: none; border-radius: 14px;
-  background: #fff; color: #007aff; font-size: 14px; font-weight: 600; cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  flex: 1; padding: 12px 0; border: 1px solid var(--border); border-radius: 14px;
+  background: var(--surface); color: var(--accent); font-size: 14px; font-weight: 600; cursor: pointer;
 }
-.dark .report-action-btn { background: #1c1c1e; color: #0a84ff; }
-
-/* 我的页 / 统计页 报告入口 */
-.report-entry-card {
-  display: flex; align-items: center; gap: 12px; width: 100%;
-  background: linear-gradient(135deg, #007aff, #5856d6); color: #fff;
-  border: none; border-radius: 18px; padding: 16px; margin-bottom: 16px; cursor: pointer;
-  box-shadow: 0 6px 20px rgba(88,86,214,.25);
-}
-.report-entry-card .entry-emoji { font-size: 28px; }
-.report-entry-card .entry-text { text-align: left; flex: 1; }
-.report-entry-card .entry-title { font-size: 16px; font-weight: 700; }
-.report-entry-card .entry-sub { font-size: 12px; opacity: .9; }
+.dark .report-action-btn { background: var(--surface); color: var(--accent); border-color: var(--border); }
 
 /* AI 设置表单 */
 .ai-form { display: flex; flex-direction: column; gap: 6px; text-align: left; margin: 8px 0; }

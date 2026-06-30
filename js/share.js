@@ -17,10 +17,10 @@ const ShareManager = {
         </div>
         <div class="share-actions">
           <button class="share-btn share-btn-copy" onclick="ShareManager.copyShareText()">
-            📋 复制文字
+            复制文字
           </button>
           <button class="share-btn share-btn-image" onclick="ShareManager.downloadShareImage()">
-            💾 保存图片
+            保存图片
           </button>
         </div>
       </div>
@@ -49,7 +49,11 @@ const ShareManager = {
     return `
       <div class="share-card">
         <div class="share-card-header">
-          <div class="share-card-logo">✨</div>
+          <div class="share-card-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3L14.5 8.5L20 11L14.5 13.5L12 19L9.5 13.5L4 11L9.5 8.5L12 3Z"/>
+            </svg>
+          </div>
           <h4>人生已完成清单</h4>
         </div>
 
@@ -90,11 +94,11 @@ const ShareManager = {
     const stats = StorageManager.getOverallStats();
     const achievements = StorageManager.getUnlockedAchievements();
 
-    const text = `✨ 我的人生清单进度 ✨
+    const text = `我的人生清单进度
 
-📊 已完成 ${stats.totalCompleted} 个任务
-🏆 解锁 ${achievements.length} 个成就
-✅ 完成 ${stats.completedLists} 个清单
+已完成 ${stats.totalCompleted} 个任务
+解锁 ${achievements.length} 个成就
+完成 ${stats.completedLists} 个清单
 
 人生就像一场旅行，每完成一个小目标都是值得纪念的时刻！
 

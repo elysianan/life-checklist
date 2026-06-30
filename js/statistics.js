@@ -8,29 +8,11 @@ const StatisticsManager = {
   renderStatisticsPage() {
     const stats = StorageManager.getOverallStats();
 
-    this._renderReportEntry(); // 新增：报告入口
     this.updateOverviewCards(stats);
     this.renderCompletionChart();
     this.renderCategoryChart();
     this.renderWeeklyChart();
     this.renderRankingList();
-  },
-
-  /** 在统计页头部下方插入「生成 AI 人生报告」入口（只插一次） */
-  _renderReportEntry() {
-    const header = document.querySelector('#statistics-view .stats-page-header');
-    if (!header || document.getElementById('stats-report-entry')) return;
-    const btn = document.createElement('button');
-    btn.id = 'stats-report-entry';
-    btn.className = 'report-entry-card';
-    btn.innerHTML = `
-      <span class="entry-emoji">✨</span>
-      <span class="entry-text">
-        <span class="entry-title">生成 AI 人生报告</span>
-        <span class="entry-sub">让 AI 为你总结这段时光</span>
-      </span>`;
-    btn.addEventListener('click', () => ReportManager.open());
-    header.insertAdjacentElement('afterend', btn);
   },
 
   updateOverviewCards(stats) {

@@ -648,7 +648,7 @@ function renderListDetail(listId) {
   const progress = StorageManager.calculateListProgress(list);
 
   const header = document.getElementById('detail-header');
-  header.style.background = `linear-gradient(135deg, ${list.color}, ${list.color}CC)`;
+  header.style.background = list.color;
 
   document.getElementById('detail-emoji').textContent = list.emoji;
   document.getElementById('detail-title').textContent = list.title;

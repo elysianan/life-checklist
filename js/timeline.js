@@ -306,8 +306,8 @@ const TimelineManager = {
           ${this._generateShareCardHTML(sorted, span)}
         </div>
         <div class="share-actions">
-          <button class="share-btn share-btn-danger" onclick="TimelineManager._downloadShareImage()">💾 保存图片</button>
-          <button class="share-btn share-btn-success" onclick="TimelineManager._shareTimeline()">🔗 分享</button>
+          <button class="share-btn share-btn-danger" onclick="TimelineManager._downloadShareImage()">保存图片</button>
+          <button class="share-btn share-btn-success" onclick="TimelineManager._shareTimeline()">分享</button>
         </div>
       </div>
     `;
@@ -328,17 +328,17 @@ const TimelineManager = {
     `).join('');
 
     return `
-      <div class="share-card" id="timeline-share-card" style="background: linear-gradient(160deg, #1c1c1e, #000); color: #fff;">
+      <div class="share-card" id="timeline-share-card" style="background: var(--surface); color: var(--text);">
         <div class="share-card-header" style="margin-bottom: 1rem;">
           <h4 style="font-size: 1.125rem; font-weight: 700;">我的人生时间轴</h4>
         </div>
-        <p style="font-size: 0.875rem; opacity: 0.8; margin-bottom: 1rem;">
+        <p style="font-size: 0.875rem; color: var(--text-2); margin-bottom: 1rem;">
           共 ${sorted.length} 件事 · 年份跨度 ${spanText}
         </p>
         <div class="timeline-share-list" style="max-height: 280px; overflow-y: auto; margin-bottom: 1rem;">
           ${items}
         </div>
-        <div class="share-card-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.75rem;">
+        <div class="share-card-footer" style="border-top: 1px solid var(--border); padding-top: 0.75rem;">
           <span>人生已完成清单 App</span>
           <span>记录每一段认真活过的日子</span>
         </div>
