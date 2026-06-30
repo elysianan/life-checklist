@@ -20,17 +20,12 @@ const SettingsManager = {
 
   applyTheme(theme) {
     const html = document.documentElement;
-
-    if (theme === 'dark') {
-      html.classList.add('dark');
-      html.style.colorScheme = 'dark';
-    } else if (theme === 'light') {
-      html.classList.remove('dark');
-      html.style.colorScheme = 'light';
-    } else {
-      html.classList.remove('dark');
-      html.style.colorScheme = 'light dark';
-    }
+    let dark;
+    if (theme === 'dark') dark = true;
+    else if (theme === 'light') dark = false;
+    else dark = window.matchMedia('(prefers-color-scheme: dark)').matches; // auto 跟随系统
+    html.classList.toggle('dark', dark);
+    html.style.colorScheme = dark ? 'dark' : 'light';
   },
 
   getSortMethod() {
