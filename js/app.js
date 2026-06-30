@@ -136,7 +136,6 @@ function bindEvents() {
   document.getElementById('back-btn').addEventListener('click', showHomePage);
   document.getElementById('ach-back-btn').addEventListener('click', showHomePage);
   document.getElementById('stats-back-btn').addEventListener('click', showHomePage);
-  document.getElementById('profile-back-btn').addEventListener('click', showHomePage);
   document.getElementById('template-back-btn').addEventListener('click', showHomePage);
 
   document.getElementById('lifeclock-back-btn').addEventListener('click', showHomePage);
@@ -251,10 +250,10 @@ function updateStreakDisplay() {
 
   if (statusElement) {
     if (streakData.todayChecked) {
-      statusElement.textContent = '🔥 今日已打卡';
+      statusElement.textContent = '今日已打卡';
       statusElement.className = 'streak-status checked';
     } else {
-      statusElement.textContent = '⏰ 今日还未打卡';
+      statusElement.textContent = '今日还未打卡';
       statusElement.className = 'streak-status pending';
     }
   }
@@ -915,7 +914,7 @@ function showDetailColorPicker(listId) {
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
     <div class="modal-content" style="max-width: 320px;">
-      <h3>🎨 主题配色</h3>
+      <h3>主题配色</h3>
       <p class="modal-desc">选择清单主题颜色</p>
       <div class="color-picker" id="detail-color-picker">
         ${colors.map(c => `
@@ -989,7 +988,7 @@ function createTaskItem(listId, task, color) {
   if (task.priority === 'high') priorityBadge = '<span class="priority-badge high">高</span>';
   else if (task.priority === 'medium') priorityBadge = '<span class="priority-badge medium">中</span>';
 
-  const noteIndicator = task.note ? '<span class="note-indicator">📝</span>' : '';
+  const noteIndicator = task.note ? '<span class="note-indicator">笔记</span>' : '';
 
   item.innerHTML = `
     <label class="task-checkbox-wrapper">
@@ -1048,22 +1047,22 @@ function showSortMenu() {
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
     <div class="modal-content" style="max-width: 300px;">
-      <h3>📊 排序方式</h3>
+      <h3>排序方式</h3>
       <div class="sort-options">
         <div class="sort-option ${currentSort === 'default' ? 'selected' : ''}" data-sort="default">
-          <span>📌</span>
+          <span>●</span>
           <span>默认顺序</span>
         </div>
         <div class="sort-option ${currentSort === 'progress' ? 'selected' : ''}" data-sort="progress">
-          <span>📈</span>
+          <span>●</span>
           <span>按进度排序</span>
         </div>
         <div class="sort-option ${currentSort === 'name' ? 'selected' : ''}" data-sort="name">
-          <span>🔤</span>
+          <span>●</span>
           <span>按名称排序</span>
         </div>
         <div class="sort-option ${currentSort === 'tasks' ? 'selected' : ''}" data-sort="tasks">
-          <span>📝</span>
+          <span>●</span>
           <span>按任务数排序</span>
         </div>
       </div>

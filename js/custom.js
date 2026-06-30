@@ -8,7 +8,7 @@ const CustomManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content" style="max-width: 360px;">
-        <h3>✨ 创建新清单</h3>
+        <h3>创建新清单</h3>
         <p class="modal-desc">自定义你的人生目标</p>
 
         <div class="form-group">
@@ -128,7 +128,7 @@ const CustomManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content">
-        <h3>📝 添加新任务</h3>
+        <h3>添加新任务</h3>
         <p class="modal-desc">添加你想完成的事情</p>
 
         <div class="form-group">
@@ -194,7 +194,7 @@ const CustomManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content">
-        <h3>⚠️ 删除清单</h3>
+        <h3>删除清单</h3>
         <p class="modal-desc">确定要删除这个清单吗？所有任务都将被删除，此操作无法撤销。</p>
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" onclick="this.closest('.modal-overlay').remove()">取消</button>
@@ -253,7 +253,7 @@ const CustomManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content">
-        <h3>✏️ 编辑清单</h3>
+        <h3>编辑清单</h3>
 
         <div class="form-group">
           <label class="form-label">清单名称</label>

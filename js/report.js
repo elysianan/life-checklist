@@ -201,25 +201,25 @@ const ReportManager = {
       </div>`).join('');
 
     const highlightsHTML = d.highlights.length ? `
-      <div class="report-section-title">📸 高光时刻</div>
+      <div class="report-section-title">高光时刻</div>
       <div class="report-highlights">
         ${d.highlights.map(h => `<div class="report-highlight"><img src="${h.photo}" alt=""><span>${h.title}</span></div>`).join('')}
       </div>` : '';
 
     return `
       <div class="report-card-title">${d.lifeProgress.age > 0 ? d.lifeProgress.age + ' 岁 · ' : ''}我的人生报告</div>
-      <div class="report-card-period">📅 ${d.periodLabel}</div>
+      <div class="report-card-period">${d.periodLabel}</div>
       <div class="report-narrative">${narrativeHTML}</div>
       <div class="report-metrics">
         <div class="report-metric"><div class="report-metric-value">${d.totalCompleted}</div><div class="report-metric-label">完成事项</div></div>
         <div class="report-metric"><div class="report-metric-value">${d.streak.current}</div><div class="report-metric-label">连续打卡</div></div>
         <div class="report-metric"><div class="report-metric-value">${d.lifeProgress.percent}%</div><div class="report-metric-label">人生进度</div></div>
       </div>
-      <div class="report-section-title">🏆 分类洞察</div>
+      <div class="report-section-title">分类洞察</div>
       ${catHTML}
       ${highlightsHTML}
       <div class="report-card-footer">
-        <span>✨ 人生已完成清单</span>
+        <span>人生已完成清单</span>
         <span>${this._todayStr()}</span>
       </div>`;
   },
@@ -232,7 +232,7 @@ const ReportManager = {
   /** 生成可复制的纯文本 */
   _plainText(d, narrative) {
     const body = narrative.source === 'api' ? narrative.text : narrative.paragraphs.join('\n');
-    return `✨ 我的人生报告 · ${d.periodLabel}\n\n${body}\n\n完成 ${d.totalCompleted} 件事 · 连续打卡 ${d.streak.current} 天 · 人生进度 ${d.lifeProgress.percent}%\n\n#人生已完成清单`;
+    return `我的人生报告 · ${d.periodLabel}\n\n${body}\n\n完成 ${d.totalCompleted} 件事 · 连续打卡 ${d.streak.current} 天 · 人生进度 ${d.lifeProgress.percent}%\n\n#人生已完成清单`;
   },
 
   /** 保存为图片：复用 ShareManager 的 html2canvas 截图 */

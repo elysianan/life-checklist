@@ -324,15 +324,34 @@
       <!-- 底部操作栏 -->
       <div class="detail-bottom-actions" id="detail-bottom-actions">
         <button class="detail-bottom-btn" id="detail-theme-btn">
-          <span class="detail-bottom-btn-icon">🎨</span>
+          <span class="detail-bottom-btn-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="13.5" cy="6.5" r=".5"/>
+              <circle cx="17.5" cy="10.5" r=".5"/>
+              <circle cx="8.5" cy="7.5" r=".5"/>
+              <circle cx="6.5" cy="12.5" r=".5"/>
+              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.043a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.01 17.461 2 12 2z"/>
+            </svg>
+          </span>
           <span class="detail-bottom-btn-label">主题配色</span>
         </button>
         <button class="detail-bottom-btn" id="detail-share-btn">
-          <span class="detail-bottom-btn-icon">🖼️</span>
+          <span class="detail-bottom-btn-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </span>
           <span class="detail-bottom-btn-label">生成图片</span>
         </button>
         <button class="detail-bottom-btn detail-bottom-btn-danger" id="detail-delete-btn">
-          <span class="detail-bottom-btn-icon">🗑️</span>
+          <span class="detail-bottom-btn-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </span>
           <span class="detail-bottom-btn-label">移除清单</span>
         </button>
       </div>
@@ -357,7 +376,12 @@
 
       <!-- 成就头部 -->
       <div class="achievement-header">
-        <div class="achievement-header-emoji">🏆</div>
+        <div class="achievement-header-emoji">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="7"/>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+          </svg>
+        </div>
         <h2>成就墙</h2>
         <div class="achievement-count" id="achievement-count">0/15</div>
         <p class="text-sm opacity-90">已解锁成就</p>
@@ -399,8 +423,8 @@
 
       <!-- 统计头部 -->
       <div class="stats-page-header">
-        <h2 class="text-2xl font-bold mb-2">📊 数据统计</h2>
-        <p class="text-sm opacity-90">了解你的完成情况</p>
+        <h2 class="text-[17px] font-semibold mb-2">数据统计</h2>
+        <p class="text-sm text-apple-gray">了解你的完成情况</p>
 
         <div class="stats-overview">
           <div class="stats-overview-item">
@@ -424,28 +448,28 @@
 
       <!-- 图表区域 -->
       <div class="chart-card">
-        <h3>📈 完成进度</h3>
+        <h3>完成进度</h3>
         <div class="chart-container-small">
           <canvas id="completion-chart"></canvas>
         </div>
       </div>
 
       <div class="chart-card">
-        <h3>📊 分类分布</h3>
+        <h3>分类分布</h3>
         <div class="chart-container">
           <canvas id="category-chart"></canvas>
         </div>
       </div>
 
       <div class="chart-card">
-        <h3>📅 本周趋势</h3>
+        <h3>本周趋势</h3>
         <div class="chart-container">
           <canvas id="weekly-chart"></canvas>
         </div>
       </div>
 
       <div class="chart-card">
-        <h3>🏅 清单排行榜</h3>
+        <h3>清单排行榜</h3>
         <div id="ranking-list">
           <!-- 排行榜将通过 JavaScript 动态生成 -->
         </div>
@@ -546,7 +570,7 @@
       </header>
 
       <div class="lifeclock-card" id="lifeclock-card">
-        <p class="life-birth-hint hidden" id="life-birth-hint">👆 点这里设为你的生日</p>
+        <p class="life-birth-hint hidden" id="life-birth-hint">点这里设为你的生日</p>
 
         <div class="life-clock-wrap" id="life-birth-trigger">
           <svg id="life-clock-svg" viewBox="0 0 200 200">
@@ -567,7 +591,7 @@
       </div>
 
       <div class="lifeclock-actions">
-        <button id="life-share-btn" class="life-action-btn">⬆ 分享</button>
+        <button id="life-share-btn" class="life-action-btn">分享</button>
         <button id="life-save-btn" class="life-action-btn">保存</button>
       </div>
       <button id="life-retire-setting" class="life-retire-link">设置退休年龄</button>

@@ -24,7 +24,7 @@ const GoalBreakdownUIManager = {
         <div id="goal-input-state" class="goal-state">
           <div class="goal-modal-header">
             <button id="goal-close-btn" class="goal-close-btn">×</button>
-            <h2 class="goal-modal-title">🎯 AI 目标拆解</h2>
+            <h2 class="goal-modal-title">AI 目标拆解</h2>
           </div>
           <div class="goal-form">
             <label class="goal-label">你的目标是什么？</label>
@@ -37,7 +37,7 @@ const GoalBreakdownUIManager = {
               <button class="goal-duration-chip" data-duration="自定义">自定义</button>
             </div>
             <input id="goal-custom-duration" type="text" class="goal-input hidden" placeholder="例如：8 个月">
-            <button id="goal-start-btn" class="goal-primary-btn" disabled>开始拆解 ✨</button>
+            <button id="goal-start-btn" class="goal-primary-btn" disabled>开始拆解</button>
           </div>
         </div>
 
@@ -56,7 +56,7 @@ const GoalBreakdownUIManager = {
           </div>
           <div id="goal-phases-container" class="goal-phases-container"></div>
           <div class="goal-preview-actions">
-            <button id="goal-refresh-btn" class="goal-secondary-btn">🔄 换一种拆法</button>
+            <button id="goal-refresh-btn" class="goal-secondary-btn">换一种拆法</button>
             <button id="goal-create-btn" class="goal-primary-btn">生成专属清单</button>
           </div>
         </div>
@@ -167,7 +167,7 @@ const GoalBreakdownUIManager = {
   renderRoadmap(roadmap) {
     document.getElementById('goal-preview-title').textContent = `${roadmap.emoji} ${roadmap.goal}`;
     const badge = document.getElementById('goal-source-badge');
-    badge.textContent = roadmap.source === 'api' ? '✨ AI 生成' : '📋 智能模板';
+    badge.textContent = roadmap.source === 'api' ? 'AI 生成' : '智能模板';
     badge.className = 'goal-source-badge ' + (roadmap.source === 'api' ? 'api' : 'rule');
 
     const container = document.getElementById('goal-phases-container');
@@ -178,7 +178,7 @@ const GoalBreakdownUIManager = {
       phaseEl.className = 'goal-phase';
       phaseEl.innerHTML = `
         <div class="goal-phase-header">
-          <span class="goal-phase-flag">🚩</span>
+          <span class="goal-phase-flag">●</span>
           <span class="goal-phase-title">阶段 ${pi + 1} · ${phase.title}</span>
           ${phase.timeLabel ? `<span class="goal-phase-time">${phase.timeLabel}</span>` : ''}
         </div>

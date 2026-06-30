@@ -25,7 +25,7 @@ const SearchManager = {
         </div>
         <div class="search-results" id="search-results">
           <div class="search-hint">
-            <p>🔍 输入关键词搜索</p>
+            <p>输入关键词搜索</p>
             <p class="search-hint-sub">支持搜索清单名称和任务内容</p>
           </div>
         </div>
@@ -57,7 +57,7 @@ const SearchManager = {
     if (!keyword.trim()) {
       container.innerHTML = `
         <div class="search-hint">
-          <p>🔍 输入关键词搜索</p>
+          <p>输入关键词搜索</p>
           <p class="search-hint-sub">支持搜索清单名称和任务内容</p>
         </div>
       `;
@@ -69,7 +69,7 @@ const SearchManager = {
     if (results.length === 0) {
       container.innerHTML = `
         <div class="search-empty">
-          <p>😔 没有找到匹配的内容</p>
+          <p>没有找到匹配的内容</p>
           <p class="search-empty-sub">试试其他关键词</p>
         </div>
       `;
@@ -94,7 +94,7 @@ const SearchManager = {
             <div class="search-result-emoji" style="background: ${result.list.color}15">${result.list.emoji}</div>
             <div class="search-result-info">
               <div class="search-result-title">${this.highlightText(result.task.text, keyword)}</div>
-              <div class="search-result-desc">${result.list.title} · ${result.task.completed ? '✅ 已完成' : '⏳ 未完成'}</div>
+              <div class="search-result-desc">${result.list.title} · ${result.task.completed ? '已完成' : '未完成'}</div>
             </div>
             <div class="search-result-type">任务</div>
           </div>

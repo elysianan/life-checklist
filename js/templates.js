@@ -22,7 +22,7 @@ const TemplateManager = {
 
       container.innerHTML = `
         <div class="recommendations-header">
-          <h3>🎯 为你推荐</h3>
+          <h3>为你推荐</h3>
           <button class="refresh-btn" id="refresh-recommendations" ${canRefresh ? '' : 'disabled'}>
             换一批 ↻
           </button>

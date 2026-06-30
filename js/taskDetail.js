@@ -17,7 +17,7 @@ const TaskDetailManager = {
       <div class="modal-content task-detail-modal">
         <div class="task-detail-header">
           <div class="task-detail-status ${task.completed ? 'completed' : ''}">
-            ${task.completed ? '✅ 已完成' : '⏳ 进行中'}
+            ${task.completed ? '已完成' : '进行中'}
           </div>
           <button class="task-detail-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
         </div>
@@ -26,7 +26,7 @@ const TaskDetailManager = {
         <p class="task-detail-list">${list.emoji} ${list.title}</p>
 
         <div class="task-detail-section">
-          <label class="form-label">📸 完成照片</label>
+          <label class="form-label">完成照片</label>
           <div class="task-photo-upload" id="task-photo-upload">
             ${task.photo ? `
               <div class="task-photo-preview">
@@ -36,24 +36,24 @@ const TaskDetailManager = {
             ` : `
               <label class="task-photo-input-label">
                 <input type="file" id="task-photo-input" accept="image/*" style="display: none;">
-                <span>📷 添加照片</span>
+                <span>添加照片</span>
               </label>
             `}
           </div>
         </div>
 
         <div class="task-detail-section">
-          <label class="form-label">📝 笔记</label>
+          <label class="form-label">笔记</label>
           <textarea id="task-note" class="form-textarea" placeholder="添加笔记...">${task.note || ''}</textarea>
         </div>
 
         <div class="task-detail-section">
-          <label class="form-label">📅 完成日期</label>
+          <label class="form-label">完成日期</label>
           <input type="date" id="task-date" class="form-input" value="${task.completedDate || ''}">
         </div>
 
         <div class="task-detail-section">
-          <label class="form-label">⭐ 重要程度</label>
+          <label class="form-label">重要程度</label>
           <div class="priority-selector" id="priority-selector">
             <span class="priority-option ${task.priority === 'low' ? 'selected' : ''}" data-priority="low">低</span>
             <span class="priority-option ${task.priority === 'medium' ? 'selected' : ''}" data-priority="medium">中</span>
@@ -63,10 +63,10 @@ const TaskDetailManager = {
 
         <div class="task-detail-actions">
           <button class="task-detail-btn task-detail-btn-delete" onclick="TaskDetailManager.deleteTask('${listId}', '${taskId}')">
-            🗑️ 删除任务
+            删除任务
           </button>
           <button class="task-detail-btn task-detail-btn-save" onclick="TaskDetailManager.saveTaskDetail('${listId}', '${taskId}')">
-            💾 保存
+            保存
           </button>
         </div>
       </div>
@@ -193,7 +193,7 @@ const TaskDetailManager = {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content">
-        <h3>⚠️ 删除任务</h3>
+        <h3>删除任务</h3>
         <p class="modal-desc">确定要删除这个任务吗？此操作无法撤销。</p>
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" onclick="this.closest('.modal-overlay').remove()">取消</button>
