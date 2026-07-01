@@ -6,7 +6,7 @@
 // ==================== 纯逻辑引擎 ====================
 const TimelineEngine = {
   /**
-   * 一次性迁移：旧结构 {id, date, title, ...} → 新 {id, year, text}
+   * 一次性迁移：旧结构 {id, date, title, ...} → 新 {id, year, month, text}
    * 过滤无合法 date 或 title 的脏数据
    */
   migrate(oldArr) {
@@ -22,6 +22,7 @@ const TimelineEngine = {
       acc.push({
         id: 'e_' + (seq++),
         year: d.getFullYear(),
+        month: d.getMonth() + 1, // 从旧 date 恢复月份；新数据直接带 month
         text: String(titleVal)
       });
       return acc;
@@ -29,11 +30,14 @@ const TimelineEngine = {
   },
 
   /**
-   * 按年份升序排序，返回新数组，不修改原数组
+   * 按年份升序、同年按月份升序排序，返回新数组，不修改原数组
    */
   sortByYear(events) {
     if (!Array.isArray(events)) return [];
-    return [...events].sort((a, b) => a.year - b.year);
+    return [...events].sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return (a.month || 1) - (b.month || 1);
+    });
   },
 
   /**
@@ -46,12 +50,14 @@ const TimelineEngine = {
   },
 
   /**
-   * 校验事件：年份 1900 ~ 当前年+100，文本非空（去空格后）
+   * 校验事件：年份 1900 ~ 当前年+100，月份 1~12，文本非空（去空格后）
    */
-  validateEvent(year, text) {
+  validateEvent(year, month, text) {
     const y = Number(year);
+    const m = Number(month);
     const currentYear = new Date().getFullYear();
     if (!Number.isFinite(y) || y < 1900 || y > currentYear + 100) return false;
+    if (!Number.isFinite(m) || m < 1 || m > 12) return false;
     if (typeof text !== 'string' || text.trim().length === 0) return false;
     return true;
   }

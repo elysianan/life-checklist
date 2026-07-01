@@ -41,8 +41,10 @@ code += `
   assert('migrate 结果长度=2（过滤无合法 date/title）', migrated.length === 2);
   assert('migrate 第1条 id=e_1', migrated[0].id === 'e_1');
   assert('migrate 第1条 year=2024', migrated[0].year === 2024);
-  assert('migrate 第1条 text=完成A', migrated[0].text === '完成A');
+  assert('migrate 第1条 month=6（从旧 date 恢复）', migrated[0].month === 6);
   assert('migrate 第2条 year=2023', migrated[1].year === 2023);
+  assert('migrate 第2条 month=1（从旧 date 恢复）', migrated[1].month === 1);
+  assert('migrate 第1条 text=完成A', migrated[0].text === '完成A');
   assert('migrate 第2条 text=完成B', migrated[1].text === '完成B');
   assert('migrate 不保留旧字段', !('date' in migrated[0]) && !('title' in migrated[0]) && !('emoji' in migrated[0]));
 
@@ -50,17 +52,20 @@ code += `
   const migrated2 = TimelineEngine.migrate(oldArr);
   assert('幂等：两次迁移结果长度相同', migrated2.length === migrated.length);
   assert('幂等：year 一致', migrated2.every((e,i)=>e.year===migrated[i].year));
+  assert('幂等：month 一致', migrated2.every((e,i)=>e.month===migrated[i].month));
   assert('幂等：text 一致', migrated2.every((e,i)=>e.text===migrated[i].text));
 
   // ---- TimelineEngine.sortByYear ----
   const unsorted = [
-    { id: 'e_3', year: 2020, text: 'C' },
-    { id: 'e_1', year: 2025, text: 'A' },
-    { id: 'e_2', year: 2022, text: 'B' }
+    { id: 'e_3', year: 2020, month: 6, text: 'C' },
+    { id: 'e_1', year: 2025, month: 1, text: 'A' },
+    { id: 'e_2', year: 2022, month: 3, text: 'B' },
+    { id: 'e_4', year: 2020, month: 1, text: 'D' }
   ];
   const sorted = TimelineEngine.sortByYear(unsorted);
-  assert('sortByYear 升序', sorted[0].year===2020 && sorted[1].year===2022 && sorted[2].year===2025);
-  assert('sortByYear 不改原数组', unsorted[0].year===2020 && unsorted[1].year===2025 && unsorted[2].year===2022);
+  assert('sortByYear 先按 year 升序', sorted[0].year === 2020 && sorted[1].year === 2020 && sorted[2].year === 2022 && sorted[3].year === 2025);
+  assert('sortByYear 同年按 month 升序', sorted[0].month === 1 && sorted[1].month === 6);
+  assert('sortByYear 不改原数组', unsorted[0].year===2020 && unsorted[1].year===2025 && unsorted[2].year===2022 && unsorted[3].year===2020);
 
   // ---- TimelineEngine.yearSpan ----
   assert('yearSpan 空数组返回 null', TimelineEngine.yearSpan([]) === null);
@@ -69,13 +74,16 @@ code += `
 
   // ---- TimelineEngine.validateEvent ----
   const currentYear = new Date().getFullYear();
-  assert('validate 合法', TimelineEngine.validateEvent(2000, 'hello') === true);
-  assert('validate 年份下限 1899 非法', TimelineEngine.validateEvent(1899, 'hello') === false);
-  assert('validate 年份上限 current+100+1 非法', TimelineEngine.validateEvent(currentYear + 101, 'hello') === false);
-  assert('validate 年份上限 current+100 合法', TimelineEngine.validateEvent(currentYear + 100, 'hello') === true);
-  assert('validate 空文本非法', TimelineEngine.validateEvent(2000, '') === false);
-  assert('validate 纯空格非法', TimelineEngine.validateEvent(2000, '   ') === false);
-  assert('validate 非数字年份非法', TimelineEngine.validateEvent('abc', 'hello') === false);
+  assert('validate 合法年月', TimelineEngine.validateEvent(2000, 6, 'hello') === true);
+  assert('validate 年份下限 1899 非法', TimelineEngine.validateEvent(1899, 6, 'hello') === false);
+  assert('validate 年份上限 current+100+1 非法', TimelineEngine.validateEvent(currentYear + 101, 6, 'hello') === false);
+  assert('validate 年份上限 current+100 合法', TimelineEngine.validateEvent(currentYear + 100, 6, 'hello') === true);
+  assert('validate 空文本非法', TimelineEngine.validateEvent(2000, 6, '') === false);
+  assert('validate 纯空格非法', TimelineEngine.validateEvent(2000, 6, '   ') === false);
+  assert('validate 非数字年份非法', TimelineEngine.validateEvent('abc', 6, 'hello') === false);
+  assert('validate 月份 0 非法', TimelineEngine.validateEvent(2000, 0, 'hello') === false);
+  assert('validate 月份 13 非法', TimelineEngine.validateEvent(2000, 13, 'hello') === false);
+  assert('validate 缺少 month 非法', TimelineEngine.validateEvent(2000, undefined, 'hello') === false);
 
   __done(passed, failed);
 })();
