@@ -8,10 +8,8 @@ const DatePickerManager = {
   open(currentDateStr, onConfirm) {
     this._onConfirm = onConfirm;
     const d = currentDateStr ? new Date(currentDateStr) : new Date(2000, 0, 1);
-    const now = new Date();
-    const maxYear = now.getFullYear();
 
-    this._fill(document.getElementById('dp-year'), this._range(1920, maxYear), d.getFullYear());
+    this._fill(document.getElementById('dp-year'), this._yearRange(), d.getFullYear());
     this._fill(document.getElementById('dp-month'), this._range(1, 12), d.getMonth() + 1);
     this._fillDays(d.getFullYear(), d.getMonth() + 1, d.getDate());
 
@@ -33,7 +31,7 @@ const DatePickerManager = {
   _range(a, b) { const r = []; for (let i = a; i <= b; i++) r.push(i); return r; },
 
   _yearRange() {
-    const maxYear = new Date().getFullYear() + 1;
+    const maxYear = new Date().getFullYear();
     const r = [];
     for (let i = maxYear; i >= 1920; i--) r.push(i);
     return r;
@@ -167,8 +165,6 @@ const DatePickerManager = {
    */
   renderInline(container, currentDateStr, onChange) {
     const d = currentDateStr ? new Date(currentDateStr) : new Date(2000, 0, 1);
-    const now = new Date();
-    const maxYear = now.getFullYear();
 
     // 构建内联滚轮 DOM（使用 class 避免 id 冲突）
     container.innerHTML = `
@@ -184,7 +180,7 @@ const DatePickerManager = {
     const monthEl = container.querySelector('.dp-inline-month');
     const dayEl = container.querySelector('.dp-inline-day');
 
-    this._fill(yearEl, this._range(1920, maxYear), d.getFullYear());
+    this._fill(yearEl, this._yearRange(), d.getFullYear());
     this._fill(monthEl, this._range(1, 12), d.getMonth() + 1);
     this._fillInlineDays(yearEl, monthEl, dayEl, d.getFullYear(), d.getMonth() + 1, d.getDate());
 
