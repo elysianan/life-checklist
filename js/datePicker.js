@@ -40,25 +40,41 @@ const DatePickerManager = {
   },
 
   /**
-   * 单列年份滚轮：复用 date-picker-mask，仅显示年份列
+   * 双列年月滚轮：复用 date-picker-mask，仅显示年份 + 月份列
    * @param {number|string} currentYear - 当前选中年份
-   * @param {function} onConfirm - 确认回调 (year) => {}
+   * @param {number|string} currentMonth - 当前选中月份（1-12）
+   * @param {function} onConfirm - 确认回调 ({year, month}) => {}
    */
-  openYear(currentYear, onConfirm) {
+  openYearMonth(currentYear, currentMonth, onConfirm) {
     const mask = document.getElementById('date-picker-mask');
     const card = mask.querySelector('.date-picker-cols');
     const units = mask.querySelector('.date-picker-units');
 
-    // 切换为单列年份模式
-    card.innerHTML = '<ul class="dp-col" id="dp-year-only"></ul>';
-    if (units) units.innerHTML = '<span>年</span>';
+    // 切换为两列年月模式
+    card.innerHTML = `
+      <ul class="dp-col" id="dp-year-only"></ul>
+      <ul class="dp-col" id="dp-month-only"></ul>
+    `;
+    if (units) units.innerHTML = '<span>年</span><span>月</span>';
 
-    const ul = document.getElementById('dp-year-only');
+    const yearUl = document.getElementById('dp-year-only');
+    const monthUl = document.getElementById('dp-month-only');
     const years = this._yearRange();
-    const sel = years.includes(Number(currentYear)) ? Number(currentYear) : 2000;
-    this._fill(ul, years, sel);
+    const months = this._range(1, 12);
 
-    ul.onscroll = () => { this._updateActiveItem(ul); };
+    const selYear = years.includes(Number(currentYear)) ? Number(currentYear) : new Date().getFullYear();
+    const selMonth = months.includes(Number(currentMonth)) ? Number(currentMonth) : new Date().getMonth() + 1;
+
+    this._fill(yearUl, years, selYear);
+    this._fill(monthUl, months, selMonth);
+
+    // 滚动时实时高亮
+    const handleScroll = () => {
+      this._updateActiveItem(yearUl);
+      this._updateActiveItem(monthUl);
+    };
+    yearUl.onscroll = handleScroll;
+    monthUl.onscroll = handleScroll;
 
     mask.classList.remove('hidden');
 
@@ -67,15 +83,16 @@ const DatePickerManager = {
       this._restoreCols(card, units);
     };
     document.getElementById('date-picker-confirm').onclick = () => {
-      const y = this._centerValue(ul);
+      const y = this._centerValue(yearUl);
+      const m = this._centerValue(monthUl);
       mask.classList.add('hidden');
       this._restoreCols(card, units);
-      if (onConfirm) onConfirm(y);
+      if (onConfirm) onConfirm({ year: y, month: m });
     };
   },
 
   /**
-   * 还原三列日期结构（openYear 用后复位，避免影响生日选择器）
+   * 还原三列日期结构（openYearMonth 用后复位，避免影响生日选择器）
    */
   _restoreCols(card, units) {
     card.innerHTML = '<ul class="dp-col" id="dp-year"></ul><ul class="dp-col" id="dp-month"></ul><ul class="dp-col" id="dp-day"></ul>';

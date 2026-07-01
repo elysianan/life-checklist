@@ -29,6 +29,12 @@ code += `
   assert('年份降序连续', r.every((y, i) => i === 0 || y === r[i - 1] - 1));
   assert('年份范围包含 2026', r.includes(2026));
 
+  // 验证 openYearMonth 生成的 DOM 结构（通过读取 DatePickerManager 源码后 vm 执行）
+  // 因 DOM 不可运行，改为验证 _yearRange 与 _range 行为
+  assert('_range 生成 1-12', DatePickerManager._range(1, 12).length === 12);
+  assert('_range 生成 1-12 首项为 1', DatePickerManager._range(1, 12)[0] === 1);
+  assert('_range 生成 1-12 末项为 12', DatePickerManager._range(1, 12)[11] === 12);
+
   __done(passed, failed);
 })();
 `;
