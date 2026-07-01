@@ -62,8 +62,9 @@ const DatePickerManager = {
     const years = this._yearRange();
     const months = this._range(1, 12);
 
-    const selYear = years.includes(Number(currentYear)) ? Number(currentYear) : new Date().getFullYear();
-    const selMonth = months.includes(Number(currentMonth)) ? Number(currentMonth) : new Date().getMonth() + 1;
+    const now = new Date();
+    const selYear = years.includes(Number(currentYear)) ? Number(currentYear) : now.getFullYear();
+    const selMonth = months.includes(Number(currentMonth)) ? Number(currentMonth) : now.getMonth() + 1;
 
     this._fill(yearUl, years, selYear);
     this._fill(monthUl, months, selMonth);
