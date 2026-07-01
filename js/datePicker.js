@@ -108,14 +108,19 @@ const DatePickerManager = {
 
   /**
    * 高亮滚轮中心项，让用户明确当前选中的年/月/日
+   * 优化：只更新发生变化的项，避免每次滚动遍历整个列表
    */
   _updateActiveItem(ul) {
     if (!ul) return;
     const idx = Math.round(ul.scrollTop / this.ITEM_H);
     const activeIdx = Math.max(0, Math.min(idx, ul.children.length - 1));
-    Array.from(ul.children).forEach((li, i) => {
-      li.classList.toggle('dp-item-active', i === activeIdx);
-    });
+    const prevIdx = ul._dpActiveIdx;
+    if (prevIdx === activeIdx) return;
+    if (prevIdx !== undefined && ul.children[prevIdx]) {
+      ul.children[prevIdx].classList.remove('dp-item-active');
+    }
+    ul.children[activeIdx].classList.add('dp-item-active');
+    ul._dpActiveIdx = activeIdx;
   },
 
   _fillDays(year, month, selectedDay) {
