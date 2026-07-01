@@ -184,6 +184,12 @@ function bindEvents() {
     lifeClockBtn.addEventListener('click', showLifeClockPage);
   }
 
+  // 首页快速创建清单按钮
+  const homeAddListBtn = document.getElementById('home-add-list-btn');
+  if (homeAddListBtn) {
+    homeAddListBtn.addEventListener('click', () => CustomManager.showAddListModal());
+  }
+
   // 首页自定义按钮
   const customBtn = document.getElementById('home-custom-btn');
   if (customBtn) {

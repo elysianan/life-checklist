@@ -36,6 +36,25 @@ html.dark {
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
+/* ==================== 首页顶栏按钮 ==================== */
+.home-header-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.home-header-btn:active {
+  transform: scale(0.92);
+  background: var(--accent-weak);
+}
+
 /* ==================== 基础样式 ==================== */
 
 * {
