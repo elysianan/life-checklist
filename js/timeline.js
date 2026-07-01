@@ -71,7 +71,18 @@ const TimelineManager = {
     const container = document.getElementById('timeline-container');
     if (!container) return;
 
-    const events = StorageManager.getTimeline();
+    let events = StorageManager.getTimeline();
+    // 兼容旧数据：无 month 字段的事件补 1 月
+    let needSave = false;
+    events = events.map(e => {
+      if (e && typeof e.month === 'undefined') {
+        needSave = true;
+        return { ...e, month: 1 };
+      }
+      return e;
+    });
+    if (needSave) StorageManager.setTimeline(events);
+
     const sorted = TimelineEngine.sortByYear(events);
 
     // 更新计数
@@ -121,7 +132,7 @@ const TimelineManager = {
       row.className = 'timeline-single-row';
       row.innerHTML = `
         <div class="timeline-single-left">
-          <span class="timeline-single-year">${ev.year}</span>
+          <span class="timeline-single-year">${this._formatYearMonth(ev.year, ev.month)}</span>
           <span class="timeline-single-dot"></span>
           <span class="timeline-single-line"></span>
         </div>
@@ -154,7 +165,7 @@ const TimelineManager = {
       row.innerHTML = `
         <div class="timeline-double-side ${isLeft ? 'left' : 'right'}">
           <div class="timeline-double-card" data-id="${ev.id}">
-            <span class="timeline-double-year">${ev.year}</span>
+            <span class="timeline-double-year">${this._formatYearMonth(ev.year, ev.month)}</span>
             <p class="timeline-double-text">${this._escapeHtml(ev.text)}</p>
           </div>
         </div>
@@ -178,6 +189,13 @@ const TimelineManager = {
     return div.innerHTML;
   },
 
+  _formatYearMonth(year, month) {
+    if (!year) return '';
+    const m = Number(month);
+    if (!Number.isFinite(m) || m < 1 || m > 12) return `${year}年`;
+    return `${year}年${m}月`;
+  },
+
   getLayout() {
     return StorageManager.getTimelineLayout();
   },
@@ -190,14 +208,15 @@ const TimelineManager = {
 
   // ==================== 添加事件 ====================
   showAddModal() {
-    this._showModal('添加人生事件', '', '', (year, text) => {
-      this.addEvent(year, text);
+    const now = new Date();
+    this._showModal('添加人生事件', now.getFullYear(), now.getMonth() + 1, '', (year, month, text) => {
+      this.addEvent(year, month, text);
     });
   },
 
-  addEvent(year, text) {
-    if (!TimelineEngine.validateEvent(year, text)) {
-      this.showToast('年份或描述不合法');
+  addEvent(year, month, text) {
+    if (!TimelineEngine.validateEvent(year, month, text)) {
+      this.showToast('时间或描述不合法');
       return false;
     }
     const events = StorageManager.getTimeline();
@@ -210,7 +229,7 @@ const TimelineManager = {
       }
     });
     const id = 'e_' + (maxSeq + 1);
-    events.push({ id, year: Number(year), text: text.trim() });
+    events.push({ id, year: Number(year), month: Number(month), text: text.trim() });
     StorageManager.setTimeline(events);
     this.renderTimelinePage();
     this.showToast('已添加');
@@ -219,22 +238,22 @@ const TimelineManager = {
 
   // ==================== 编辑/删除事件 ====================
   _showEditModal(ev) {
-    this._showModal('编辑事件', ev.year, ev.text, (year, text) => {
-      this.updateEvent(ev.id, year, text);
+    this._showModal('编辑事件', ev.year, ev.month, ev.text, (year, month, text) => {
+      this.updateEvent(ev.id, year, month, text);
     }, () => {
       this.deleteEvent(ev.id);
     });
   },
 
-  updateEvent(id, year, text) {
-    if (!TimelineEngine.validateEvent(year, text)) {
-      this.showToast('年份或描述不合法');
+  updateEvent(id, year, month, text) {
+    if (!TimelineEngine.validateEvent(year, month, text)) {
+      this.showToast('时间或描述不合法');
       return false;
     }
     const events = StorageManager.getTimeline();
     const idx = events.findIndex(e => e.id === id);
     if (idx === -1) return false;
-    events[idx] = { id, year: Number(year), text: text.trim() };
+    events[idx] = { id, year: Number(year), month: Number(month), text: text.trim() };
     StorageManager.setTimeline(events);
     this.renderTimelinePage();
     this.showToast('已更新');
@@ -249,16 +268,17 @@ const TimelineManager = {
   },
 
   // ==================== 通用弹窗 ====================
-  _showModal(title, yearVal, textVal, onConfirm, onDelete) {
+  _showModal(title, yearVal, monthVal, textVal, onConfirm, onDelete) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal-content" style="max-width: 320px;">
         <h3>${title}</h3>
         <div class="modal-input-container" style="text-align:left;">
-          <label class="form-label">年份</label>
-          <button type="button" class="form-input tl-year-display" id="tl-modal-year-btn">${yearVal || '点击选择年份'}</button>
+          <label class="form-label">时间</label>
+          <button type="button" class="form-input tl-year-display" id="tl-modal-year-btn">${this._formatYearMonth(yearVal, monthVal) || '点击选择时间'}</button>
           <input type="hidden" id="tl-modal-year" value="${yearVal}">
+          <input type="hidden" id="tl-modal-month" value="${monthVal}">
           <label class="form-label" style="margin-top:1rem;">描述</label>
           <textarea class="form-textarea" id="tl-modal-text" rows="3" placeholder="记录这件大事...">${textVal}</textarea>
         </div>
@@ -274,19 +294,26 @@ const TimelineManager = {
 
     const yearBtn = document.getElementById('tl-modal-year-btn');
     const yearHidden = document.getElementById('tl-modal-year');
+    const monthHidden = document.getElementById('tl-modal-month');
     yearBtn.addEventListener('click', () => {
-      DatePickerManager.openYear(yearHidden.value || new Date().getFullYear(), (y) => {
-        yearHidden.value = y;
-        yearBtn.textContent = y;
-      });
+      DatePickerManager.openYearMonth(
+        yearHidden.value || new Date().getFullYear(),
+        monthHidden.value || (new Date().getMonth() + 1),
+        ({ year, month }) => {
+          yearHidden.value = year;
+          monthHidden.value = month;
+          yearBtn.textContent = this._formatYearMonth(year, month);
+        }
+      );
     });
 
     document.getElementById('tl-modal-cancel').addEventListener('click', () => overlay.remove());
     document.getElementById('tl-modal-confirm').addEventListener('click', () => {
       const year = document.getElementById('tl-modal-year').value;
+      const month = document.getElementById('tl-modal-month').value;
       const text = document.getElementById('tl-modal-text').value;
       overlay.remove();
-      onConfirm(year, text);
+      onConfirm(year, month, text);
     });
 
     if (onDelete) {
@@ -335,7 +362,7 @@ const TimelineManager = {
     const spanText = span ? `${span.min} — ${span.max}` : '—';
     const items = sorted.map(ev => `
       <div class="timeline-share-item">
-        <span class="timeline-share-year">${ev.year}</span>
+        <span class="timeline-share-year">${this._formatYearMonth(ev.year, ev.month)}</span>
         <span class="timeline-share-text">${this._escapeHtml(ev.text)}</span>
       </div>
     `).join('');
