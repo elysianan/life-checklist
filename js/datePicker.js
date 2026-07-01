@@ -15,8 +15,13 @@ const DatePickerManager = {
     this._fill(document.getElementById('dp-month'), this._range(1, 12), d.getMonth() + 1);
     this._fillDays(d.getFullYear(), d.getMonth() + 1, d.getDate());
 
-    document.getElementById('dp-year').onscroll = () => this._onYearMonthChange();
-    document.getElementById('dp-month').onscroll = () => this._onYearMonthChange();
+    const yearEl = document.getElementById('dp-year');
+    const monthEl = document.getElementById('dp-month');
+    const dayEl = document.getElementById('dp-day');
+
+    yearEl.onscroll = () => { this._updateActiveItem(yearEl); this._onYearMonthChange(); };
+    monthEl.onscroll = () => { this._updateActiveItem(monthEl); this._onYearMonthChange(); };
+    dayEl.onscroll = () => { this._updateActiveItem(dayEl); };
 
     document.getElementById('date-picker-mask').classList.remove('hidden');
     document.getElementById('date-picker-cancel').onclick = () => this.close();
@@ -27,7 +32,12 @@ const DatePickerManager = {
 
   _range(a, b) { const r = []; for (let i = a; i <= b; i++) r.push(i); return r; },
 
-  _yearRange() { return this._range(1920, new Date().getFullYear() + 1); },
+  _yearRange() {
+    const maxYear = new Date().getFullYear() + 1;
+    const r = [];
+    for (let i = maxYear; i >= 1920; i--) r.push(i);
+    return r;
+  },
 
   /**
    * 单列年份滚轮：复用 date-picker-mask，仅显示年份列
@@ -47,6 +57,8 @@ const DatePickerManager = {
     const years = this._yearRange();
     const sel = years.includes(Number(currentYear)) ? Number(currentYear) : 2000;
     this._fill(ul, years, sel);
+
+    ul.onscroll = () => { this._updateActiveItem(ul); };
 
     mask.classList.remove('hidden');
 
@@ -74,6 +86,20 @@ const DatePickerManager = {
     ul.innerHTML = values.map(v => `<li data-v="${v}">${v}</li>`).join('');
     const idx = Math.max(0, values.indexOf(selected));
     ul.scrollTop = idx * this.ITEM_H;
+    // 初始高亮中心项
+    this._updateActiveItem(ul);
+  },
+
+  /**
+   * 高亮滚轮中心项，让用户明确当前选中的年/月/日
+   */
+  _updateActiveItem(ul) {
+    if (!ul) return;
+    const idx = Math.round(ul.scrollTop / this.ITEM_H);
+    const activeIdx = Math.max(0, Math.min(idx, ul.children.length - 1));
+    Array.from(ul.children).forEach((li, i) => {
+      li.classList.toggle('dp-item-active', i === activeIdx);
+    });
   },
 
   _fillDays(year, month, selectedDay) {
@@ -146,6 +172,9 @@ const DatePickerManager = {
 
     // 绑定滚动事件（年月变化时重填日）
     const handleScroll = () => {
+      this._updateActiveItem(yearEl);
+      this._updateActiveItem(monthEl);
+      this._updateActiveItem(dayEl);
       clearTimeout(this._inlineTimer);
       this._inlineTimer = setTimeout(() => {
         const y = this._centerValue(yearEl);
@@ -159,6 +188,7 @@ const DatePickerManager = {
     yearEl.onscroll = handleScroll;
     monthEl.onscroll = handleScroll;
     dayEl.onscroll = () => {
+      this._updateActiveItem(dayEl);
       clearTimeout(this._inlineTimer);
       this._inlineTimer = setTimeout(() => {
         this._emitInlineValue(yearEl, monthEl, dayEl, onChange);

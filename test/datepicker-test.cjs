@@ -24,9 +24,10 @@ code += `
   const r = DatePickerManager._yearRange();
   const cur = new Date().getFullYear();
 
-  assert('年份范围起点 1920', r[0] === 1920);
-  assert('年份范围终点 当前年+1', r[r.length - 1] === cur + 1);
-  assert('年份升序连续', r.every((y, i) => i === 0 || y === r[i - 1] + 1));
+  assert('年份范围起点为当前年+1', r[0] === cur + 1);
+  assert('年份范围终点为 1920', r[r.length - 1] === 1920);
+  assert('年份降序连续', r.every((y, i) => i === 0 || y === r[i - 1] - 1));
+  assert('年份范围包含 2026', r.includes(2026));
 
   __done(passed, failed);
 })();
