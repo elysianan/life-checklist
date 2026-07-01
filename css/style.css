@@ -3170,6 +3170,12 @@ body {
 }
 .dp-col::-webkit-scrollbar { display: none; }
 .dp-col li { height: 36px; line-height: 36px; scroll-snap-align: center; font-size: 18px; color: var(--text); }
+.dp-item-active {
+  color: var(--accent);
+  font-weight: 600;
+  transform: scale(1.08);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
 .date-picker-units { display: flex; }
 .date-picker-units span { flex: 1; text-align: center; font-size: 13px; color: var(--text-2); }
 
