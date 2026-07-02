@@ -401,15 +401,12 @@ function updateListsOverview() {
     const progress = StorageManager.calculateListProgress(l);
     return progress.percentage === 100;
   }).length;
-  const totalTasks = lists.reduce((sum, l) => sum + l.tasks.length, 0);
 
   const elTotal = document.getElementById('lists-total');
   const elCompleted = document.getElementById('lists-completed');
-  const elTasks = document.getElementById('lists-tasks');
   const elCount = document.getElementById('lists-count');
   if (elTotal) elTotal.textContent = totalLists;
   if (elCompleted) elCompleted.textContent = completedLists;
-  if (elTasks) elTasks.textContent = totalTasks;
   if (elCount) elCount.textContent = `共 ${totalLists} 个清单`;
 }
 
