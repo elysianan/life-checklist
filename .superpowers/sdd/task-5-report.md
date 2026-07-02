@@ -1,78 +1,59 @@
-# Task 5 报告：首页快速创建按钮
+# Task 5 报告：自定义模式 — 修复拖动排序
 
 ## 实现内容
 
-按 brief 完成以下改动：
+按任务简报要求，仅修改 `js/app.js` 中的 `DragSortManager`：
 
-1. **index.html 顶栏**  
-   将原有的「自定义」按钮用 `div.flex.items-center.gap-2` 包裹，并在左侧新增圆形「+」按钮（`id="home-add-list-btn"`），使用 24 画布的加号 SVG 图标。
+- `_onTouchStart`：移除 `if (AppState.isEditing) return;` 检查，使自定义编辑模式下长按可触发拖动；新增 `e.target.closest('.home-list-card-delete')` 判断，避免点击删除角标时误触发拖动。
+- `_onMouseDown`：同步移除编辑模式限制，并添加相同的删除角标保护。
 
-2. **css/style.css 样式**  
-   新增 `.home-header-btn` 类，设置 36×36px 圆形按钮、surface 背景、accent 颜色、阴影与点击缩放反馈。
+未改动其它拖动逻辑（`_startDrag`、`_enterDragState`、`_onMove`、`_onEnd` 等保持原样）。
 
-3. **js/app.js 事件绑定**  
-   在「首页自定义按钮」代码块上方新增对 `home-add-list-btn` 的点击监听，调用 `CustomManager.showAddListModal()` 直接弹出创建清单弹窗。
+## 测试结果
 
-## 验证结果
+### 单元测试
 
-使用 Playwright 在本地 `http://localhost:8080` 进行自动化手动验证：
+运行全部 `.cjs` 单元测试，结果如下：
 
-- 打开首页 → 点击右上角「+」→ 成功弹出「创建新清单」模态框。✅
-- 点击「自定义」→ 按钮文案变为「完成」，进入编辑模式。✅
-- 在编辑模式下点击「+」→ 仍能弹出「创建新清单」模态框。✅
+| 测试文件 | 结果 |
+| --- | --- |
+| recommendations-test.cjs | 15 通过 / 0 失败 |
+| goal-breakdown-test.cjs | 22 通过 / 0 失败 |
+| life-clock-test.cjs | 18 通过 / 0 失败 |
+| life-progress-test.cjs | 38 通过 / 0 失败 |
+| report-test.cjs | 21 通过 / 0 失败 |
+| settings-test.cjs | 4 通过 / 0 失败 |
+| datepicker-test.cjs | 7 通过 / 0 失败 |
+| home-quick-create-test.cjs | 通过 |
+| timeline-test.cjs | 29 通过 / 0 失败 |
+| datepicker-active-test.cjs | 4 通过 / 0 失败 |
+| storage-test.cjs | 通过 |
+| home-stats-overview-test.cjs | 通过 |
 
-## 变更文件
+全部通过，无回归。
 
-- `index.html`
-- `js/app.js`
-- `css/style.css`
+### 浏览器验证
 
-## 提交记录
+使用 Playwright 在 Chromium 中打开 `index.html`，验证以下场景：
 
-- SHA: `41d44ab`
-- Subject: `feat(home): 顶栏新增快速创建清单按钮`
+1. **编辑模式长按可拖动**：点击首页右上角「自定义」进入编辑模式，长按第一张清单卡片约 600ms 后，原卡片获得 `home-list-card-dragging` 类，并生成 `home-list-card-ghost` 幽灵元素。
+2. **拖动换位**：将卡片向下拖动约 150px 后松开，卡片落位到新位置。
+3. **顺序持久化**：退出编辑模式后，卡片顺序保持为拖动后的结果。
+4. **删除角标不误触发**：重新进入编辑模式，直接点击卡片右上角删除按钮，未生成 ghost 元素，未进入拖动状态。
 
-## 自审发现
+验证脚本：`test-screenshots/verify-task5-drag.cjs`（已删除临时文件，未提交）。
 
-- 代码严格按 brief 实现，未引入额外依赖或兼容代码。
-- 临时验证脚本 `test/task-5-verify.js` 已清理，未进入提交。
-- 未发现明显问题。
+## 文件变更
 
-## 关注点
+- `js/app.js`：修改 `DragSortManager._onTouchStart` 和 `_onMouseDown`。
+
+## Self-review
+
+- 改动范围严格限定在任务要求的两处事件处理函数内，未影响其它拖动逻辑。
+- 删除角标通过 `e.target.closest('.home-list-card-delete')` 提前 return，避免与卡片的点击/长按事件冲突。
+- 全部现有单元测试通过，未引入回归。
+- 浏览器端到端验证覆盖任务简报中的三项验收点。
+
+## 问题或顾虑
 
 无。
-
----
-
-## Fix：补充单元测试（2026-07-02）
-
-按 review 要求新增 `test/home-quick-create-test.cjs`，使用项目内已有的 `fs` + `vm` + 最小 sandbox 风格，不引入浏览器或 Playwright。
-
-### 测试覆盖
-
-1. 读取 `index.html`，断言包含 `id="home-add-list-btn"`。
-2. 在 Node.js `vm` 沙箱中加载 `js/app.js`，mock `document` 与相关 Manager：
-   - 所有 `getElementById` 返回带事件记录的 stub 元素。
-   - `CustomManager.showAddListModal()` 用 spy 替换。
-   - 调用 `bindEvents()` 后，触发 `home-add-list-btn` 的 click 回调，断言 spy 被调用。
-3. 若完整绑定测试因依赖问题失败，自动回退到源码级断言，确保 `home-add-list-btn.addEventListener('click', ...)` 存在。
-
-### 验证结果
-
-```
-✅ index.html 顶栏包含 id="home-add-list-btn" 的快速创建按钮
-✅ js/app.js 暴露 bindEvents 函数
-✅ home-add-list-btn 已绑定 click 事件
-✅ 点击 home-add-list-btn 会调用 CustomManager.showAddListModal()
-🎉 所有测试通过
-```
-
-### 新增/修改文件
-
-- `test/home-quick-create-test.cjs`
-- `.superpowers/sdd/task-5-report.md`
-
-### 提交记录
-
-- SHA: `f3b867a`
-- Subject: `test(home): 首页快速创建按钮单元测试`
