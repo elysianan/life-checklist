@@ -6,6 +6,24 @@ const fs = require('fs');
 const vm = require('vm');
 const path = require('path');
 
+function createMockElement(tag = 'div') {
+  return {
+    tagName: tag,
+    className: '',
+    style: {},
+    innerHTML: '',
+    textContent: '',
+    scrollTop: 0,
+    dataset: {},
+    children: [],
+    appendChild(child) { this.children.push(child); },
+    addEventListener() {},
+    querySelector() { return createMockElement('div'); },
+    classList: { toggle() {} }
+  };
+}
+const timelineContainer = { innerHTML: '', children: [], appendChild(child) { this.children.push(child); }, classList: { toggle() {} } };
+
 const store = {};
 const sandbox = {
   localStorage: {
@@ -15,7 +33,13 @@ const sandbox = {
     clear: () => { Object.keys(store).forEach(k => delete store[k]); }
   },
   console, Date, Math, JSON, Object, Array, parseInt, parseFloat, isNaN, Number, RegExp, String, Error, setTimeout, clearTimeout,
-  document: undefined, window: undefined, navigator: undefined,
+  document: {
+    getElementById(id) { return id === 'timeline-container' ? timelineContainer : null; },
+    createElement(tag) { return createMockElement(tag); },
+    body: { appendChild() {} }
+  },
+  AnimationManager: { animateCardEntrance() {} },
+  window: undefined, navigator: undefined,
   __done: (p, f) => { console.log(`\n结果: ${p} 通过 / ${f} 失败`); if (f > 0) process.exitCode = 1; }
 };
 
@@ -107,6 +131,68 @@ code += `
   assert('validateDate 月份 0 非法', TimelineEngine.validateDate(2000, 0, 15, 'hello') === false);
   assert('validateDate 日期 0 非法', TimelineEngine.validateDate(2000, 6, 0, 'hello') === false);
   assert('validateDate 缺少 day 非法', TimelineEngine.validateDate(2000, 6, undefined, 'hello') === false);
+
+  // ---- 通过 TimelineManager.renderTimelinePage() 触发的 day 字段迁移 ----
+  function deepEqual(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  const container = document.getElementById('timeline-container');
+  function resetRenderState() {
+    container.innerHTML = '';
+    container.children.length = 0;
+    localStorage.removeItem(StorageManager.KEYS.TIMELINE_DAY_MIGRATED);
+    StorageManager.setTimelineLayout('single');
+  }
+
+  // 1. 无 day 的事件补 day:1 并保存
+  localStorage.clear();
+  resetRenderState();
+  const eventsNoDay = [
+    { id: 'e_1', year: 2020, month: 5, text: '事件A' },
+    { id: 'e_2', year: 2021, month: 2, text: '事件B' }
+  ];
+  StorageManager.setTimeline(eventsNoDay);
+  TimelineManager.renderTimelinePage();
+  const savedAfterMigrate = StorageManager.getTimeline();
+  assert('day 迁移：缺失 day 的事件补为 1', savedAfterMigrate[0].day === 1 && savedAfterMigrate[1].day === 1);
+  assert('day 迁移：其他字段保持不变', savedAfterMigrate[0].year === 2020 && savedAfterMigrate[0].month === 5 && savedAfterMigrate[0].text === '事件A');
+  assert('day 迁移：设置 migrated flag', StorageManager.isTimelineDayMigrated());
+
+  // 2. 已有 day 的事件保持不变
+  localStorage.clear();
+  resetRenderState();
+  const eventsWithDay = [{ id: 'e_1', year: 2020, month: 5, day: 15, text: '事件A' }];
+  StorageManager.setTimeline(eventsWithDay);
+  TimelineManager.renderTimelinePage();
+  assert('day 迁移：已有 day 的事件不被覆盖', deepEqual(StorageManager.getTimeline(), eventsWithDay));
+  assert('day 迁移：已有 day 也设置 flag', StorageManager.isTimelineDayMigrated());
+
+  // 3. migrated 为 true 后不再写入 storage，也不再补 day
+  localStorage.clear();
+  resetRenderState();
+  StorageManager.setTimeline([{ id: 'e_1', year: 2020, month: 5, text: '事件A' }]);
+  StorageManager.setTimelineDayMigrated();
+  let writeCount = 0;
+  const origSetTimeline = StorageManager.setTimeline;
+  StorageManager.setTimeline = (arr) => { writeCount++; origSetTimeline(arr); };
+  TimelineManager.renderTimelinePage();
+  StorageManager.setTimeline = origSetTimeline;
+  assert('day 迁移：已 migrated 后不再写入 timeline', writeCount === 0);
+  assert('day 迁移：已 migrated 后不会补 day', StorageManager.getTimeline()[0].day === undefined);
+
+  // 4. 空数组 / 脏数据不抛错
+  localStorage.clear();
+  resetRenderState();
+  let noThrowEmpty = true;
+  try { StorageManager.setTimeline([]); TimelineManager.renderTimelinePage(); } catch (e) { noThrowEmpty = false; console.error(e); }
+  assert('day 迁移：空数组不抛错且设置 flag', noThrowEmpty && StorageManager.isTimelineDayMigrated());
+
+  localStorage.clear();
+  resetRenderState();
+  let noThrowDirty = true;
+  try {
+    StorageManager.setTimeline([null, undefined, 'foo', { id: 'e_x', year: 2020, month: 3, text: 'ok' }]);
+    TimelineManager.renderTimelinePage();
+  } catch (e) { noThrowDirty = false; console.error(e); }
+  assert('day 迁移：脏数据不抛错且设置 flag', noThrowDirty && StorageManager.isTimelineDayMigrated());
 
   __done(passed, failed);
 })();

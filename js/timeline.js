@@ -34,11 +34,13 @@ const TimelineEngine = {
    */
   sortByYear(events) {
     if (!Array.isArray(events)) return [];
-    return [...events].sort((a, b) => {
-      if (a.year !== b.year) return a.year - b.year;
-      if ((a.month || 1) !== (b.month || 1)) return (a.month || 1) - (b.month || 1);
-      return (a.day || 1) - (b.day || 1);
-    });
+    return [...events]
+      .filter(e => e && e.year != null && !isNaN(e.year))
+      .sort((a, b) => {
+        if (a.year !== b.year) return a.year - b.year;
+        if ((a.month || 1) !== (b.month || 1)) return (a.month || 1) - (b.month || 1);
+        return (a.day || 1) - (b.day || 1);
+      });
   },
 
   /**
@@ -100,7 +102,7 @@ const TimelineManager = {
     if (!StorageManager.isTimelineDayMigrated()) {
       let dayNeedSave = false;
       events = events.map(e => {
-        if (e && typeof e.day === 'undefined') {
+        if (e && typeof e === 'object' && !Array.isArray(e) && typeof e.day === 'undefined') {
           dayNeedSave = true;
           return { ...e, day: 1 };
         }
@@ -267,7 +269,7 @@ const TimelineManager = {
 
   // ==================== 编辑/删除事件 ====================
   _showEditModal(ev) {
-    this._showModal('编辑事件', ev.year, ev.month, ev.day || 1, ev.text, (year, month, day, text) => {
+    this._showModal('编辑事件', ev.year, ev.month, ev.day ?? 1, ev.text, (year, month, day, text) => {
       this.updateEvent(ev.id, year, month, day, text);
     }, () => {
       this.deleteEvent(ev.id);
