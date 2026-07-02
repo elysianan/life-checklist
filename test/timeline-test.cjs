@@ -85,6 +85,29 @@ code += `
   assert('validate 月份 13 非法', TimelineEngine.validateEvent(2000, 13, 'hello') === false);
   assert('validate 缺少 month 非法', TimelineEngine.validateEvent(2000, undefined, 'hello') === false);
 
+  // ---- day 字段迁移 ----
+  const oldMonthOnly = [
+    { id: 'e_1', year: 2024, month: 6, text: 'A' },
+    { id: 'e_2', year: 2023, month: 1, text: 'B' }
+  ];
+  const withDay = oldMonthOnly.map(e => ({ ...e, day: 1 }));
+  // 测试运行时通过 TimelineManager 渲染触发迁移，这里直接测试 sortByYear
+  const daySorted = TimelineEngine.sortByYear([
+    { id: 'e_1', year: 2024, month: 6, day: 15, text: 'A' },
+    { id: 'e_2', year: 2024, month: 6, day: 1, text: 'B' },
+    { id: 'e_3', year: 2024, month: 5, day: 20, text: 'C' }
+  ]);
+  assert('sortByYear 同年同月按 day 升序', daySorted[0].day === 20 && daySorted[1].day === 1 && daySorted[2].day === 15);
+
+  // ---- validateDate ----
+  assert('validateDate 合法年月日', TimelineEngine.validateDate(2000, 6, 15, 'hello') === true);
+  assert('validateDate 闰年 2-29 合法', TimelineEngine.validateDate(2024, 2, 29, 'hello') === true);
+  assert('validateDate 非闰年 2-29 非法', TimelineEngine.validateDate(2023, 2, 29, 'hello') === false);
+  assert('validateDate 4-31 非法', TimelineEngine.validateDate(2023, 4, 31, 'hello') === false);
+  assert('validateDate 月份 0 非法', TimelineEngine.validateDate(2000, 0, 15, 'hello') === false);
+  assert('validateDate 日期 0 非法', TimelineEngine.validateDate(2000, 6, 0, 'hello') === false);
+  assert('validateDate 缺少 day 非法', TimelineEngine.validateDate(2000, 6, undefined, 'hello') === false);
+
   __done(passed, failed);
 })();
 `;

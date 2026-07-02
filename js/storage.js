@@ -19,6 +19,7 @@ const StorageManager = {
     PERSONS: 'life_checklist_persons',
     TIMELINE_LAYOUT: 'life_checklist_timeline_layout',
     TIMELINE_MIGRATED: 'life_checklist_timeline_migrated',
+    TIMELINE_DAY_MIGRATED: 'life_checklist_timeline_day_migrated',
     CUSTOM_QUOTE: 'life_checklist_custom_quote'
   },
 
@@ -406,6 +407,14 @@ const StorageManager = {
 
   setTimelineMigrated() {
     localStorage.setItem(this.KEYS.TIMELINE_MIGRATED, 'true');
+  },
+
+  isTimelineDayMigrated() {
+    return localStorage.getItem(this.KEYS.TIMELINE_DAY_MIGRATED) === 'true';
+  },
+
+  setTimelineDayMigrated() {
+    localStorage.setItem(this.KEYS.TIMELINE_DAY_MIGRATED, 'true');
   },
 
   initializeData() {

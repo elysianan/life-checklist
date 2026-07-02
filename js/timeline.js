@@ -30,13 +30,14 @@ const TimelineEngine = {
   },
 
   /**
-   * 按年份升序、同年按月份升序排序，返回新数组，不修改原数组
+   * 按年份升序、同年按月份升序、同月按日期升序排序，返回新数组，不修改原数组
    */
   sortByYear(events) {
     if (!Array.isArray(events)) return [];
     return [...events].sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
-      return (a.month || 1) - (b.month || 1);
+      if ((a.month || 1) !== (b.month || 1)) return (a.month || 1) - (b.month || 1);
+      return (a.day || 1) - (b.day || 1);
     });
   },
 
@@ -50,16 +51,28 @@ const TimelineEngine = {
   },
 
   /**
-   * 校验事件：年份 1900 ~ 当前年+100，月份 1~12，文本非空（去空格后）
+   * 校验日期与文本：年份 1900 ~ 当前年+100，月份 1~12，日期 1~31（含闰年、大小月校验），文本非空（去空格后）
    */
-  validateEvent(year, month, text) {
+  validateDate(year, month, day, text) {
     const y = Number(year);
     const m = Number(month);
+    const d = Number(day);
     const currentYear = new Date().getFullYear();
     if (!Number.isFinite(y) || y < 1900 || y > currentYear + 100) return false;
     if (!Number.isFinite(m) || m < 1 || m > 12) return false;
+    if (!Number.isFinite(d) || d < 1 || d > 31) return false;
+    // 校验真实日期（含闰年、大小月）
+    const testDate = new Date(y, m - 1, d);
+    if (testDate.getFullYear() !== y || testDate.getMonth() !== m - 1 || testDate.getDate() !== d) return false;
     if (typeof text !== 'string' || text.trim().length === 0) return false;
     return true;
+  },
+
+  /**
+   * 保留 validateEvent 作为 validateDate 的别名（兼容旧调用点）
+   */
+  validateEvent(year, month, text) {
+    return this.validateDate(year, month, 1, text);
   }
 };
 
