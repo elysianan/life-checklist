@@ -1230,21 +1230,23 @@ body {
 .timeline-double-wrap { position: relative; padding: 0.5rem 0; }
 .timeline-double-axis {
   position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
-  background: var(--border); transform: translateX(-50%);
+  background: var(--border); transform: translateX(-50%); z-index: 0;
 }
-.timeline-double-row { display: flex; align-items: center; margin-bottom: 1rem; position: relative; }
+.timeline-double-row { display: flex; align-items: center; position: relative; margin-bottom: 1rem; }
 .timeline-double-side { flex: 1; display: flex; }
-.timeline-double-side.left { justify-content: flex-end; padding-right: 1.25rem; }
-.timeline-double-side.right { justify-content: flex-start; padding-left: 1.25rem; }
-.timeline-double-center { flex: 0 0 0; position: relative; }
+.timeline-double-side.left { justify-content: flex-end; padding-right: 1rem; }
+.timeline-double-side.right { justify-content: flex-start; padding-left: 1rem; }
+.timeline-double-center {
+  width: 20px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
 .timeline-double-dot {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: 12px; height: 12px; border-radius: 50%;
   background: var(--accent); box-shadow: 0 0 0 3px var(--accent-weak); z-index: 1;
 }
 .timeline-double-card {
-  max-width: 100%; background: var(--surface); border-radius: var(--radius);
-  padding: 0.75rem 0.9rem; box-shadow: var(--shadow); cursor: pointer;
+  max-width: 80%; background: var(--surface); border-radius: var(--radius);
+  padding: 0.75rem 1rem; box-shadow: var(--shadow); cursor: pointer;
 }
 .timeline-double-year { display: block; font-size: 0.8125rem; font-weight: 700; color: var(--accent); margin-bottom: 0.25rem; }
 .timeline-double-text { margin: 0; color: var(--text); font-size: 0.875rem; line-height: 1.45; }

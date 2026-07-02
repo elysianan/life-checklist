@@ -191,17 +191,18 @@ const TimelineManager = {
       const row = document.createElement('div');
       row.className = 'timeline-double-row';
       const isLeft = index % 2 === 0;
-      row.innerHTML = `
-        <div class="timeline-double-side ${isLeft ? 'left' : 'right'}">
-          <div class="timeline-double-card" data-id="${ev.id}">
-            <span class="timeline-double-year">${this._formatDate(ev.year, ev.month, ev.day)}</span>
-            <p class="timeline-double-text">${this._escapeHtml(ev.text)}</p>
-          </div>
+      const cardHtml = `
+        <div class="timeline-double-card" data-id="${ev.id}">
+          <span class="timeline-double-year">${this._formatDate(ev.year, ev.month, ev.day)}</span>
+          <p class="timeline-double-text">${this._escapeHtml(ev.text)}</p>
         </div>
+      `;
+      row.innerHTML = `
+        <div class="timeline-double-side left">${isLeft ? cardHtml : ''}</div>
         <div class="timeline-double-center">
           <span class="timeline-double-dot"></span>
         </div>
-        <div class="timeline-double-side ${isLeft ? 'right' : 'left'}"></div>
+        <div class="timeline-double-side right">${isLeft ? '' : cardHtml}</div>
       `;
       const card = row.querySelector('.timeline-double-card');
       card.addEventListener('click', () => this._showEditModal(ev));
