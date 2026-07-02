@@ -190,6 +190,77 @@ const ShareManager = {
     });
   },
 
+  // 生成余生闹钟分享文案
+  generateLifeClockShareText(age, lifeExpectancy, events) {
+    const ageFloor = Math.floor(age);
+    const remainingYears = Math.max(0, lifeExpectancy - ageFloor);
+    const remainingDays = Math.round(remainingYears * 365.25);
+    const eventLines = events.slice(0, 3).map(e => `${e.emoji} ${e.text}`).join('\n');
+    return `我今年 ${ageFloor} 岁了，余生大约还有 ${remainingDays.toLocaleString('zh-CN')} 天。\n\n${eventLines}\n\n认真活好每一天 ✨\n#人生清单 #余生闹钟`;
+  },
+
+  // 显示余生闹钟分享弹窗
+  showLifeClockShareModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'share-overlay';
+    overlay.innerHTML = `
+      <div class="share-modal">
+        <div class="share-modal-header">
+          <h3>分享余生闹钟</h3>
+          <button class="share-close-btn" onclick="this.closest('.share-overlay').remove()">✕</button>
+        </div>
+        <div class="share-actions-vertical" style="display:flex;flex-direction:column;gap:0.75rem;padding:1rem;">
+          <button class="share-btn share-btn-image" id="life-share-save">保存图片</button>
+          <button class="share-btn share-btn-copy" id="life-share-copy">复制文案</button>
+          <button class="share-btn share-btn-success" id="life-share-system">系统分享</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const ageEl = document.getElementById('life-age-value');
+    const age = ageEl ? parseFloat(ageEl.textContent) : 0;
+    const lifeExpectancy = StorageManager.getLifeExpectancy();
+    const birth = LifeClockUI.getEffectiveBirthDate();
+    const events = LifeClockEngine.calcEvents({
+      birthDate: birth,
+      now: Date.now(),
+      lifeExpectancy: lifeExpectancy
+    });
+    const shareText = this.generateLifeClockShareText(age, lifeExpectancy, events);
+
+    document.getElementById('life-share-save').addEventListener('click', () => {
+      this.saveLifeClockImage();
+    });
+
+    document.getElementById('life-share-copy').addEventListener('click', () => {
+      navigator.clipboard.writeText(shareText).then(() => {
+        this.showToast('文案已复制 ✅');
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = shareText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        this.showToast('文案已复制 ✅');
+      });
+    });
+
+    const systemBtn = document.getElementById('life-share-system');
+    if (navigator.share) {
+      systemBtn.addEventListener('click', () => {
+        navigator.share({ title: '余生闹钟', text: shareText }).catch(() => {});
+      });
+    } else {
+      systemBtn.style.display = 'none';
+    }
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+  },
+
   // 分享：优先系统分享，降级为保存图片
   shareLifeClock() {
     const age = document.getElementById('life-age-value');

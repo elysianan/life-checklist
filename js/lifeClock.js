@@ -72,7 +72,7 @@ const LifeClockUI = {
     }
     const shareBtn = document.getElementById('life-share-btn');
     const saveBtn = document.getElementById('life-save-btn');
-    if (shareBtn) shareBtn.onclick = () => ShareManager.shareLifeClock();
+    if (shareBtn) shareBtn.onclick = () => ShareManager.showLifeClockShareModal();
     if (saveBtn) saveBtn.onclick = () => ShareManager.saveLifeClockImage();
   },
 
