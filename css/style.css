@@ -304,6 +304,12 @@ body {
   box-shadow: var(--shadow);
   color: var(--text);
   position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.quote-card:active {
+  transform: scale(0.98);
 }
 
 .quote-icon {

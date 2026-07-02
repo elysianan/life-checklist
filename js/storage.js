@@ -18,7 +18,8 @@ const StorageManager = {
     LIST_ORDER: 'life_checklist_list_order',
     PERSONS: 'life_checklist_persons',
     TIMELINE_LAYOUT: 'life_checklist_timeline_layout',
-    TIMELINE_MIGRATED: 'life_checklist_timeline_migrated'
+    TIMELINE_MIGRATED: 'life_checklist_timeline_migrated',
+    CUSTOM_QUOTE: 'life_checklist_custom_quote'
   },
 
   getBirthDate() {
@@ -379,6 +380,24 @@ const StorageManager = {
 
   setTimelineLayout(layout) {
     localStorage.setItem(this.KEYS.TIMELINE_LAYOUT, layout);
+  },
+
+  getCustomQuote() {
+    const data = localStorage.getItem(this.KEYS.CUSTOM_QUOTE);
+    if (!data) return null;
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  setCustomQuote(quote) {
+    localStorage.setItem(this.KEYS.CUSTOM_QUOTE, JSON.stringify(quote));
+  },
+
+  clearCustomQuote() {
+    localStorage.removeItem(this.KEYS.CUSTOM_QUOTE);
   },
 
   isTimelineMigrated() {

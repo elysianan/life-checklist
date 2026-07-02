@@ -198,6 +198,13 @@ function bindEvents() {
 
   // 初始化长按拖动排序
   DragSortManager.init();
+
+  // 首页格言卡片点击编辑
+  const quoteCard = document.querySelector('.quote-card');
+  if (quoteCard) {
+    quoteCard.style.cursor = 'pointer';
+    quoteCard.addEventListener('click', () => showQuoteEditModal());
+  }
 }
 
 /**
@@ -272,12 +279,87 @@ function updateDailyQuote() {
   const quoteElement = document.getElementById('daily-quote');
   const authorElement = document.querySelector('.quote-author');
 
-  const today = new Date();
-  const dayIndex = today.getDate() % QUOTES.length;
-  const quote = QUOTES[dayIndex];
+  const custom = StorageManager.getCustomQuote();
+  let quote;
+  if (custom && custom.text && custom.text.trim()) {
+    quote = custom;
+  } else {
+    const today = new Date();
+    const dayIndex = today.getDate() % QUOTES.length;
+    quote = QUOTES[dayIndex];
+  }
 
   if (quoteElement) quoteElement.textContent = quote.text;
-  if (authorElement) authorElement.textContent = '— ' + quote.author;
+  if (authorElement) authorElement.textContent = '— ' + (quote.author || '佚名');
+}
+
+/**
+ * 显示轻量提示
+ */
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.className = 'share-toast';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 2000);
+}
+
+/**
+ * 显示格言编辑弹窗
+ */
+function showQuoteEditModal() {
+  const custom = StorageManager.getCustomQuote();
+  const defaultText = custom ? custom.text : '';
+  const defaultAuthor = custom ? custom.author : '';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-content" style="max-width: 320px;">
+      <h3>编辑今日格言</h3>
+      <div class="modal-input-container" style="text-align:left;">
+        <label class="form-label">格言</label>
+        <textarea id="quote-text" class="form-textarea" rows="3" placeholder="输入你想看到的格言...">${defaultText}</textarea>
+        <label class="form-label" style="margin-top:1rem;">作者</label>
+        <input type="text" id="quote-author" class="form-input" placeholder="作者（可选）" value="${defaultAuthor}">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="quote-cancel">取消</button>
+        <button class="modal-btn modal-btn-danger" id="quote-reset">恢复默认</button>
+        <button class="modal-btn modal-btn-confirm" id="quote-save">保存</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  document.getElementById('quote-cancel').addEventListener('click', () => overlay.remove());
+  document.getElementById('quote-reset').addEventListener('click', () => {
+    StorageManager.clearCustomQuote();
+    updateDailyQuote();
+    overlay.remove();
+    showToast('已恢复默认格言');
+  });
+  document.getElementById('quote-save').addEventListener('click', () => {
+    const text = document.getElementById('quote-text').value.trim();
+    if (!text) {
+      showToast('格言内容不能为空');
+      return;
+    }
+    const author = document.getElementById('quote-author').value.trim();
+    StorageManager.setCustomQuote({ text, author });
+    updateDailyQuote();
+    overlay.remove();
+    showToast('格言已保存 ✅');
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
 }
 
 /**
