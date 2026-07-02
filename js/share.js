@@ -173,6 +173,43 @@ const ShareManager = {
     }
   },
 
+  // 截图清单详情卡片（标题条 + 标签网格）为 PNG 并下载
+  captureDetailCard() {
+    const shareArea = document.getElementById('detail-share-area');
+    if (!shareArea) return;
+
+    const run = () => {
+      html2canvas(shareArea, {
+        backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
+        scale: 2,
+        useCORS: true,
+        logging: false
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = '我的清单_' + new Date().toISOString().slice(0, 10) + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        this.showToast('图片已保存 ✅');
+      }).catch(err => {
+        console.error('html2canvas 失败:', err);
+        this.showToast('图片生成失败，请重试');
+      });
+    };
+
+    if (!window.html2canvas) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.onload = run;
+      script.onerror = () => {
+        this.showToast('图片生成失败，请重试');
+        script.remove();
+      };
+      document.head.appendChild(script);
+    } else {
+      run();
+    }
+  },
+
   // 分享：优先系统分享，降级为保存图片
   shareLifeClock() {
     const age = document.getElementById('life-age-value');

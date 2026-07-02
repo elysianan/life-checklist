@@ -979,10 +979,7 @@ function bindDetailBottomActions(listId) {
     themeBtn.onclick = () => showDetailColorPicker(listId);
   }
   if (shareBtn) {
-    shareBtn.onclick = () => {
-      const card = document.getElementById('detail-header');
-      if (card) ShareManager.captureCard(card);
-    };
+    shareBtn.onclick = () => ShareManager.captureDetailCard();
   }
   if (deleteBtn) {
     deleteBtn.onclick = () => CustomManager.deleteList(listId);
