@@ -113,15 +113,23 @@ const TaskDetailManager = {
   },
 
   openPhotoLightbox(photoSrc) {
+    // 防止重复打开多个图片灯箱
+    const existing = document.querySelector('.photo-lightbox-overlay');
+    if (existing) return;
+
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay photo-lightbox-overlay';
     overlay.innerHTML = `
       <div class="photo-lightbox-content">
         <img src="${photoSrc}" alt="完成照片">
-        <button class="photo-lightbox-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+        <button class="photo-lightbox-close">✕</button>
       </div>
     `;
     document.body.appendChild(overlay);
+
+    overlay.querySelector('.photo-lightbox-close').addEventListener('click', () => {
+      overlay.remove();
+    });
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) overlay.remove();
     });
