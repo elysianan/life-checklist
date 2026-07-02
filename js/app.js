@@ -525,17 +525,16 @@ const DragSortManager = {
   },
 
   _onTouchStart(e) {
-    if (AppState.isEditing) return;
+    // 自定义模式下允许拖动；点击删除角标时不触发
     const card = e.target.closest('.home-list-card');
-    if (!card) return;
+    if (!card || e.target.closest('.home-list-card-delete')) return;
     const touch = e.touches[0];
     this._startDrag(card, touch.clientX, touch.clientY);
   },
 
   _onMouseDown(e) {
-    if (AppState.isEditing) return;
     const card = e.target.closest('.home-list-card');
-    if (!card) return;
+    if (!card || e.target.closest('.home-list-card-delete')) return;
     this._startDrag(card, e.clientX, e.clientY);
   },
 
