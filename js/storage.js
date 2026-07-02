@@ -16,6 +16,7 @@ const StorageManager = {
     RECOMMENDATIONS_CACHE: 'life_checklist_recommendations_cache',
     LIFE_EXPECTANCY: 'life_checklist_life_expectancy',
     LIST_ORDER: 'life_checklist_list_order',
+    RETIRE_AGE: 'life_checklist_retire_age',
     PERSONS: 'life_checklist_persons',
     TIMELINE_LAYOUT: 'life_checklist_timeline_layout',
     TIMELINE_MIGRATED: 'life_checklist_timeline_migrated',

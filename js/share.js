@@ -117,20 +117,30 @@ const ShareManager = {
     });
   },
 
-  // 确保 html2canvas 可用后执行回调
+  // 确保 html2canvas 可用后执行回调（缓存进行中的注入，避免重复创建 script 标签）
   _withHtml2Canvas(callback) {
     if (window.html2canvas) {
       callback();
       return;
     }
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-    script.onload = () => callback();
-    script.onerror = () => {
-      this.showToast('图片生成失败，请重试');
-      script.remove();
-    };
-    document.head.appendChild(script);
+    if (!this._html2canvasPromise) {
+      this._html2canvasPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.onload = () => {
+          this._html2canvasPromise = null;
+          resolve();
+        };
+        script.onerror = () => {
+          this._html2canvasPromise = null;
+          this.showToast('图片生成失败，请重试');
+          script.remove();
+          reject(new Error('html2canvas 加载失败'));
+        };
+        document.head.appendChild(script);
+      });
+    }
+    this._html2canvasPromise.then(() => callback(), () => {});
   },
 
   downloadShareImage() {
@@ -225,7 +235,8 @@ const ShareManager = {
     const events = LifeClockEngine.calcEvents({
       birthDate: birth,
       now: Date.now(),
-      lifeExpectancy: lifeExpectancy
+      lifeExpectancy: lifeExpectancy,
+      retireAge: StorageManager.getRetireAge()
     });
     const shareText = this.generateLifeClockShareText(age, lifeExpectancy, events);
 
@@ -259,17 +270,6 @@ const ShareManager = {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) overlay.remove();
     });
-  },
-
-  // 分享：优先系统分享，降级为保存图片
-  shareLifeClock() {
-    const age = document.getElementById('life-age-value');
-    const text = age ? `你 ${age.textContent} 岁了，余生还可以体验很多美好 ✨` : '余生闹钟';
-    if (navigator.share) {
-      navigator.share({ title: '余生闹钟', text }).catch(() => {});
-    } else {
-      this.saveLifeClockImage();
-    }
   },
 
   showToast(message) {
