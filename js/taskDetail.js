@@ -30,7 +30,7 @@ const TaskDetailManager = {
           <div class="task-photo-upload" id="task-photo-upload">
             ${task.photo ? `
               <div class="task-photo-preview">
-                <img src="${task.photo}" alt="完成照片">
+                <img src="${task.photo}" alt="完成照片" onclick="TaskDetailManager.openPhotoLightbox('${task.photo}')">
                 <button class="task-photo-remove" onclick="TaskDetailManager.removePhoto('${listId}', '${taskId}')">✕</button>
               </div>
             ` : `
@@ -98,8 +98,9 @@ const TaskDetailManager = {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      this.showToast('照片大小不能超过 2MB');
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_SIZE) {
+      this.showToast('照片大小不能超过 10MB');
       return;
     }
 
@@ -109,6 +110,21 @@ const TaskDetailManager = {
       this.saveTaskPhoto(listId, taskId, photoData);
     };
     reader.readAsDataURL(file);
+  },
+
+  openPhotoLightbox(photoSrc) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay photo-lightbox-overlay';
+    overlay.innerHTML = `
+      <div class="photo-lightbox-content">
+        <img src="${photoSrc}" alt="完成照片">
+        <button class="photo-lightbox-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
   },
 
   saveTaskPhoto(listId, taskId, photoData) {
