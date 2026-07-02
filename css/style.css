@@ -160,6 +160,7 @@ body {
 
 .home-list-editing .home-list-card {
   cursor: grab;
+  overflow: visible; /* 左侧删除角标可伸出卡片外，避免被截断 */
 }
 
 /* 拖动态 */
