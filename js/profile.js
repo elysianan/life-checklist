@@ -70,16 +70,26 @@ const ProfileManager = {
           <p>完成任务解锁成就</p>
         </div>
       `;
-      return;
+    } else {
+      recentAchievements.forEach(achievement => {
+        const badge = document.createElement('div');
+        badge.className = 'achievement-preview-badge';
+        badge.innerHTML = `<span class="preview-emoji">${achievement.emoji}</span>`;
+        badge.title = achievement.title;
+        container.appendChild(badge);
+      });
     }
 
-    recentAchievements.forEach(achievement => {
-      const badge = document.createElement('div');
-      badge.className = 'achievement-preview-badge';
-      badge.innerHTML = `<span class="preview-emoji">${achievement.emoji}</span>`;
-      badge.title = achievement.title;
-      container.appendChild(badge);
-    });
+    // 点击最近成就跳转成就墙
+    container.style.cursor = 'pointer';
+    container.onclick = () => {
+      const unlocked = StorageManager.getUnlockedAchievements();
+      if (unlocked.length === 0) {
+        this.showToast('还没有解锁成就，去完成几个任务吧');
+      } else {
+        showView('achievements');
+      }
+    };
   },
 
   renderSettingsList() {

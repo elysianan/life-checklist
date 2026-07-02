@@ -1651,11 +1651,6 @@ body {
   color: var(--text-2);
 }
 
-.profile-user-arrow {
-  color: var(--text-3);
-  flex-shrink: 0;
-}
-
 .profile-section {
   background: var(--surface);
   border-radius: var(--radius);
@@ -1674,6 +1669,11 @@ body {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+#profile-achievements-preview:active {
+  transform: scale(0.98);
+  opacity: 0.9;
 }
 
 .achievement-preview-badge {
