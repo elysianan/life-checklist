@@ -866,9 +866,13 @@ function bindTagTapLongPress(tag, listId, taskId, currentCompleted) {
       clearTimeout(timer);
       timer = null;
     }
-    // 若长按未触发，视为轻点打卡
+    // 若长按未触发，视为轻点打卡/取消
     if (!longPressFired) {
-      const newCompleted = !currentCompleted;
+      // 从当前数据读取最新状态，避免闭包变量过期
+      const list = AppState.lists.find(l => l.id === listId);
+      const task = list ? list.tasks.find(t => t.id === taskId) : null;
+      const currentlyCompleted = task ? task.completed : false;
+      const newCompleted = !currentlyCompleted;
       applyTaskToggleEffects(listId, taskId, newCompleted, tag);
     }
   }
