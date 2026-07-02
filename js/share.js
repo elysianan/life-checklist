@@ -117,20 +117,26 @@ const ShareManager = {
     });
   },
 
+  // 确保 html2canvas 可用后执行回调
+  _withHtml2Canvas(callback) {
+    if (window.html2canvas) {
+      callback();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    script.onload = () => callback();
+    script.onerror = () => {
+      this.showToast('图片生成失败，请重试');
+      script.remove();
+    };
+    document.head.appendChild(script);
+  },
+
   downloadShareImage() {
     const card = document.querySelector('.share-card');
     if (!card) return;
-
-    if (!window.html2canvas) {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-      script.onload = () => {
-        this.captureCard(card);
-      };
-      document.head.appendChild(script);
-    } else {
-      this.captureCard(card);
-    }
+    this._withHtml2Canvas(() => this.captureCard(card));
   },
 
   captureCard(element) {
@@ -151,36 +157,23 @@ const ShareManager = {
   saveLifeClockImage() {
     const element = document.getElementById('lifeclock-card');
     if (!element) return;
-    const run = () => {
+    this._withHtml2Canvas(() => {
       html2canvas(element, { backgroundColor: '#f5f5f0', scale: 2 }).then(canvas => {
         const link = document.createElement('a');
         link.download = '余生闹钟_' + new Date().toISOString().slice(0, 10) + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
       });
-    };
-    if (!window.html2canvas) {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-      script.onload = run;
-      script.onerror = () => {
-        this.showToast('图片生成失败，请重试');
-        script.remove();
-      };
-      document.head.appendChild(script);
-    } else {
-      run();
-    }
+    });
   },
 
   // 截图清单详情卡片（标题条 + 标签网格）为 PNG 并下载
   captureDetailCard() {
     const shareArea = document.getElementById('detail-share-area');
     if (!shareArea) return;
-
-    const run = () => {
+    this._withHtml2Canvas(() => {
       html2canvas(shareArea, {
-        backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
+        backgroundColor: getComputedStyle(document.body).backgroundColor,
         scale: 2,
         useCORS: true,
         logging: false
@@ -194,20 +187,7 @@ const ShareManager = {
         console.error('html2canvas 失败:', err);
         this.showToast('图片生成失败，请重试');
       });
-    };
-
-    if (!window.html2canvas) {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-      script.onload = run;
-      script.onerror = () => {
-        this.showToast('图片生成失败，请重试');
-        script.remove();
-      };
-      document.head.appendChild(script);
-    } else {
-      run();
-    }
+    });
   },
 
   // 分享：优先系统分享，降级为保存图片
