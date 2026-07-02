@@ -309,6 +309,20 @@ function showToast(message) {
 }
 
 /**
+ * HTML 转义辅助函数，用于安全地把用户输入插入模板
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
  * 显示格言编辑弹窗
  */
 function showQuoteEditModal() {
@@ -323,9 +337,9 @@ function showQuoteEditModal() {
       <h3>编辑今日格言</h3>
       <div class="modal-input-container" style="text-align:left;">
         <label class="form-label">格言</label>
-        <textarea id="quote-text" class="form-textarea" rows="3" placeholder="输入你想看到的格言...">${defaultText}</textarea>
+        <textarea id="quote-text" class="form-textarea" rows="3" placeholder="输入你想看到的格言...">${escapeHtml(defaultText)}</textarea>
         <label class="form-label" style="margin-top:1rem;">作者</label>
-        <input type="text" id="quote-author" class="form-input" placeholder="作者（可选）" value="${defaultAuthor}">
+        <input type="text" id="quote-author" class="form-input" placeholder="作者（可选）" value="${escapeHtml(defaultAuthor)}">
       </div>
       <div class="modal-actions">
         <button class="modal-btn modal-btn-cancel" id="quote-cancel">取消</button>
@@ -820,7 +834,7 @@ function createTaskTag(listId, task, color) {
   tag.appendChild(deleteBtn);
 
   // 轻点/长按判定
-  bindTagTapLongPress(tag, listId, task.id, task.completed);
+  bindTagTapLongPress(tag, listId, task.id);
 
   return tag;
 }
@@ -828,7 +842,7 @@ function createTaskTag(listId, task, color) {
 /**
  * 标签轻点/长按判定（原生手写，支持触摸+鼠标）
  */
-function bindTagTapLongPress(tag, listId, taskId, currentCompleted) {
+function bindTagTapLongPress(tag, listId, taskId) {
   const LONG_PRESS_MS = 500;
   const MOVE_THRESHOLD = 10;
 
